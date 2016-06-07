@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+  <class name="com.uib.library.domain.User" table="user">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.UserBase</meta>
+    <id name="usrId" column="user_id" type="integer">
+      <!--<column name="user_id" precision="22" scale="0"/>-->
+      <generator class="increment"/>
+    </id>
+    <many-to-one class="com.uib.library.domain.Role" fetch="select" name="libRole">
+      <column name="role_id" precision="22" scale="0"/>
+    </many-to-one>
+    <property name="frstNm" type="string">
+      <column length="20" name="frst_nm" not-null="true"/>
+    </property>
+    <property name="lstNm" type="string">
+      <column length="20" name="last_nm" not-null="true"/>
+    </property>
+    <property name="usrnm" type="string">
+      <column length="20" name="user_nm" not-null="true"/>
+    </property>
+    <property name="pswd" type="string">
+      <column length="20" name="pswd" not-null="true"/>
+    </property>
+    <property name="md5Pswd" type="string">
+      <column length="32" name="MD5_pswd"/>
+    </property>
+    <property name="email" type="string">
+      <column length="50" name="email"/>
+    </property>
+    <property name="sts" type="integer">
+      <column name="sts" not-null="true" precision="22" scale="0"/>
+    </property>
+    <property name="nbrOfAllowFilms" type="integer">
+      <column name="nbr_of_allow_fm" precision="22" scale="0"/>
+    </property>
+    <set fetch="select" inverse="true" lazy="true" name="libRnts" table="rent">
+      <key>
+        <column name="user_id" not-null="true" precision="22" scale="0"/>
+      </key>
+      <one-to-many class="com.uib.library.domain.Rent"/>
+    </set>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Nov 11, 2010 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.vicert.library.domain.LibUsr" table="LIB_USR">
+    <meta attribute="generated-class" inherit="false">com.vicert.library.domain.base.LibUsrBase</meta>
+		<id name="usrId" type="integer">
+			<column name="USR_ID" precision="22" scale="0" />
+			<generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+			<param name="sequence_name">IDUSERAUTOINC</param>
+			<param name="increment_size">0</param>
+			<param name="optimizer">pooled</param>
+			</generator>
+		</id>
+        <many-to-one name="libRole" class="com.vicert.library.domain.LibRole" fetch="select" >
+            <column name="ROLE_ID" precision="22" scale="0" />
+        </many-to-one>
+        <property name="frstNm" type="string">
+            <column name="FRST_NM" length="20" not-null="true" />
+        </property>
+        <property name="lstNm" type="string">
+            <column name="LST_NM" length="20" not-null="true" />
+        </property>
+        <property name="usrnm" type="string">
+            <column name="USRNM" length="20" not-null="true" />
+        </property>
+        <property name="pswd" type="string">
+            <column name="PSWD" length="20" not-null="true" />
+        </property>
+		<property name="md5Pswd" type="string">
+            <column name="MD5_PSWD" length="32" />
+        </property>
+		<property name="email" type="string">
+            <column name="EMAIL" length="40" />
+        </property>
+        <property name="sts" type="integer">
+            <column name="STS" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="nbrOfAllowBk" type="integer">
+            <column name="NBR_OF_ALLOW_BK" precision="22" scale="0" />
+        </property>
+        <set name="libRnts" table="LIB_RNT" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="USR_ID" precision="22" scale="0" not-null="true" />
+            </key>
+            <one-to-many class="com.vicert.library.domain.LibRnt" />
+        </set>
+    </class>
+</hibernate-mapping>

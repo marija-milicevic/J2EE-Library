@@ -1,0 +1,24 @@
+package com.vicert.library.model;
+
+import java.util.List;
+
+public class SearchAuthorServiceModel {
+	
+	private List<AuthorModel> list;
+	private int results;
+	
+	//GETTERS AND SETTERS
+	public void setList(List<AuthorModel> list) {
+		this.list = list;
+	}
+	public List<AuthorModel> getList() {
+		return list;
+	}
+	public void setResults(int results) {
+		this.results = results;
+	}
+	public int getResults() {
+		return results;
+	}
+
+}

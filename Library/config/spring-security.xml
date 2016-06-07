@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+ 	http://www.springframework.org/schema/security 
+	http://www.springframework.org/schema/security/spring-security-3.0.xsd ">
+	
+	<!-- Must be enterd in order to set annotations on methods which will be secured !-->
+	
+	<global-method-security pre-post-annotations="enabled"/>
+	
+	<!-- 
+		1.If acces is deniend redirect to Controller method /denied
+		2.Permit access to all img,css,js and stating pages 
+		3.For everything else check if authentication passed
+		4.Use my own login form
+	!-->
+
+	<http use-expressions="true" access-denied-page="/denied.htm">
+		<intercept-url pattern="/tempCSS/**" access="permitAll" />
+		<intercept-url pattern="/css/**" access="permitAll" />
+		<intercept-url pattern="/img/**" access="permitAll" />
+		<intercept-url pattern="/js/**" access="permitAll" />
+		<intercept-url pattern="/loginPage.htm" access="permitAll" />
+		<intercept-url pattern="/registrationPage.htm" access="permitAll" />
+		<intercept-url pattern="/register.htm" access="permitAll" />
+		<intercept-url pattern="/**" access="isAuthenticated()" />
+		<form-login login-page="/loginPage.htm"
+			authentication-failure-url="/loginPage.htm?login_error=1" 
+			always-use-default-target='true'
+			default-target-url='/login.htm'/>
+		<logout invalidate-session="true"/>		
+	</http>
+	
+	<!-- Write my own Service to check authentication/authorization from database -->
+
+	<authentication-manager>
+    	<authentication-provider user-service-ref="secUserServiceApi">	
+    		<password-encoder hash="md5"/>
+		</authentication-provider>
+  	</authentication-manager>
+       
+</beans:beans>

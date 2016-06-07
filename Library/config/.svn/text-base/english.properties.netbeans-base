@@ -1,0 +1,6 @@
+menu.home = Home page
+menu.regs = Registration managemet
+menu.auth = Author management
+menu.book = Book management
+menu.rent = Book renting
+menu.lgot = Log out

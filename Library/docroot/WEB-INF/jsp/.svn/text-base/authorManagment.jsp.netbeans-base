@@ -1,0 +1,121 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="java.util.*" %>
+
+    
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Author managment page</title>
+<link rel="stylesheet" href="css/jQueryUiCSS/jquery-ui-1.8.6.custom.css" type="text/css" media="screen" charset="utf-8" />
+<script type="text/javascript" src="<c:url value="/js/jquery-1.4.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.6.custom.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/deleteAuthorDialog.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/confirmMessage.js"/>"></script>
+</head>
+<body>
+
+
+				<c:if test="${empty authorList}">
+					No authros available
+				</c:if>
+				<c:if test="${not empty authorList}">
+				<table>
+				<thead>								
+					<tr>
+				         <th>
+				         	<a href="sort.htm?sort=at_athrNm" ">Author name</a>
+				         	<br/>				  
+				         	<c:set value="${grid.sortAthrName}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/>       	
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=at_dtOfBth">Date of Birth</a>
+				         	<br/>
+				         	<c:set value="${grid.sortAthrDateOfBirth}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/>   
+				         </th>
+				         <th>
+					         <a href="sort.htm?sort=at_creatUsrId">User entered</a>
+					         <br/>
+					         <c:set value="${grid.sortAthrCreateUser}" var="sortImg" scope="request"/>
+					         <c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=at_creatDt">Date entred</a>
+				         	<br/>
+				         	<c:set value="${grid.sortAthrCreateDate}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>				         
+				         	 <a href="sort.htm?sort=at_updtUsrId">User updated</a>
+				         	 <br/>
+					         <c:set value="${grid.sortAthrUpdateUser}" var="sortImg" scope="request"/>
+					         <c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=at_updtDt">Date updated</a>
+				         	<br/>
+				         	<c:set value="${grid.sortAthrUpdateDate}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>Update</th>
+				         <th>Delete</th>
+				    </tr>
+				</thead>
+				<c:forEach var="author" items="${authorList}">
+				        <tr>
+				          <td>${author.athrNm}</td>				          
+				          <td>${author.dtOfBth}</td>
+				          <td>${author.creatUsr}</td>	
+				          <td>${author.creatDt}</td>
+				          <td>${author.updtUsr}</td>	
+				          <td>${author.updtDt}</td>
+				          <td>
+						    <form method="post" action="singleAuthorPage.htm?isNew=false">
+							<input type="hidden" name="athrId" value="${author.athrId}"/>							  
+							<button type="submit">Update</button>
+							</form> 
+						  </td>
+						  <td>
+						    <form method="post" id="deleteAuthor" action="deleteAuthor.htm">
+							<input type="hidden" name="athrId" value="${author.athrId}"/>							  
+							<button type="submit" name="delete${author.athrId}">Delete</button>
+							</form> 
+						  </td>
+				        </tr>
+				</c:forEach>	
+				<thead>		
+					<tr>
+						<th>
+							<form action="searchAuthor.htm" method="post">
+							<input style="width: 100px" type="text" name="athrNm">
+							</form>
+						</th>
+					</tr>		
+				</thead>							
+				</table>	
+				
+				<c:import url="/WEB-INF/jsp/pager.jsp"></c:import>	
+				
+				<p>				
+				<a href="singleAuthorPage.htm?isNew=true"><img src="<c:url value="/img/plus.gif"/>"></a>
+				</p>		
+		  			
+				</c:if>	
+				
+				<div id="dialog-message" title="Delete author">
+					<p align="center" id="err">${deleteAuthorErr}</p>	
+				</div>					
+				
+				<div id="dialog-confirm" title="Delete author ?" style="display: none;"> 
+					<p>
+						<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+						Author will be permanently deleted and cannot be recovered. Are you sure?
+					</p>
+				</div>
+														
+</body>
+</html>

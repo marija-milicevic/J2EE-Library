@@ -1,0 +1,9 @@
+db.dialect=org.hibernate.dialect.Oracle10gDialect
+
+db.statementBatchSize=50
+db.showSql=true
+db.formatSql=true
+db.cache.useSecondLevelCache=true
+db.cache.providerClass=org.hibernate.cache.EhCacheProvider
+db.cache.useQueryCache=false
+db.cache.statementCacheSize=50

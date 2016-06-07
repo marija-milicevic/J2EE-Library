@@ -1,0 +1,208 @@
+/**
+ * 
+ */
+package com.vicert.library.repository.impl;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.LibRole;
+import com.vicert.library.domain.LibUsr;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchRegRepositoryModel;
+import com.vicert.library.repository.UserRepositoryApi;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class UserRepositoryImpl extends BaseRepositoryImpl implements UserRepositoryApi {
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibUsr> getUsersByRoleName(String roleName){
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		crit.createAlias("user.libRole", "role");
+		crit.add(Restrictions.eq("role.roleNm", roleName));
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibUsr> getUsersByUsername(String username){
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		crit.add(Restrictions.eq("usrnm", username));
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibUsr> getUsersByStatus(int status) {
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		crit.add(Restrictions.eq("sts", status));
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LibUsr> getInactiveUsersByGrid(GridModel grid){
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		crit.add(Restrictions.eq("sts", 0));
+		if(!grid.isSortDesc()){
+			crit.addOrder(Order.asc(grid.getCmpString()));
+		}
+		else{
+			crit.addOrder(Order.desc(grid.getCmpString()));
+		}
+		String search=grid.getSearchString();
+		if(!search.equals("")){
+			crit.add(Restrictions.like(search.substring(0, search.lastIndexOf('_')),search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));					
+		}
+		crit.setFirstResult(grid.getItemsPerPage()*grid.getPageNumber());	
+		crit.setMaxResults(grid.getItemsPerPage());		
+		return crit.list();
+	}
+	
+	public int getNumberOfInactiveUsers(){
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		crit.add(Restrictions.eq("sts", 0));
+		return crit.list().size();
+	}
+
+	@Override
+	public LibUsr getUserByUsrnmPswd(String username, String password) {
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		
+		if(username!=null && password!=null){
+			if(!username.equals("") && !password.equals("")){
+				crit.add(Restrictions.eq("sts", 1));
+				crit.add(Restrictions.eq("usrnm", username));
+				crit.add(Restrictions.eq("pswd", password));
+				return (LibUsr)crit.uniqueResult();
+			}			
+		}
+		return null;
+	}
+	
+	@Override
+	public LibUsr getUserByUsrnmMD5Pswd(String username, String MD5password) {
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");
+		
+		if(username!=null && MD5password!=null){
+			if(!username.equals("") && !MD5password.equals("")){
+				crit.add(Restrictions.eq("sts", 1));
+				crit.add(Restrictions.eq("usrnm", username));
+				crit.add(Restrictions.eq("md5Pswd", MD5password));
+				return (LibUsr)crit.uniqueResult();
+			}			
+		}
+		return null;
+	}
+	
+	@Override
+	public LibUsr getUserById(int id) {
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");		
+		if(id!=0){
+			crit.add(Restrictions.eq("usrId", id));
+			return (LibUsr)crit.uniqueResult();			
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibUsr> getUserByUsersnameExceptId(String username,int usrId) {
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");		
+		crit.add(Restrictions.eq("usrnm", username));
+		crit.add(Restrictions.ne("usrId", usrId));			
+		return crit.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibRnt> getRentsByUserId(int usrId) {
+		Criteria crit = getSession().createCriteria(LibRnt.class, "rent");
+		crit.add(Restrictions.eq("rent.libUsr.usrId", usrId));
+		return crit.list();
+		
+	}
+	
+	@Override
+	public LibRole getRoleByName(String roleName) {
+		Criteria crit = getSession().createCriteria(LibRole.class, "role");
+		crit.add(Restrictions.eq("roleNm", roleName));
+		return (LibRole)crit.uniqueResult();
+	}
+
+	@Override
+	public void deleteAllUsers() {
+		deleteAll("LibUsr");
+	}
+
+	@Override
+	public void deleteAllRoles() {
+		deleteAll("LibRole");		
+	}
+
+	@Override
+	public void deleteAllRents() {
+		deleteAll("LibRnt");
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibRnt> deleteRentsbyUsrId(int usrId) {
+		Criteria crit = getSession().createCriteria(LibRnt.class, "rent");
+		crit.add(Restrictions.eq("rent.libUsr.usrId", usrId));
+		List<LibRnt> list = crit.list();
+		for(LibRnt libRnt:list){
+			delete(libRnt);
+		}		
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public SearchRegRepositoryModel searchRegByFirstName(String frstNm,int res){
+		SearchRegRepositoryModel ret = new SearchRegRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");	
+		crit.add(Restrictions.eq("sts", 0));
+		crit.addOrder(Order.asc("frstNm"));
+		crit.add(Restrictions.like("frstNm", frstNm, MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public SearchRegRepositoryModel searchRegByLastName(String lstNm,int res){
+		SearchRegRepositoryModel ret = new SearchRegRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");	
+		crit.add(Restrictions.eq("sts", 0));
+		crit.addOrder(Order.asc("frstNm"));
+		crit.add(Restrictions.like("lstNm", lstNm, MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public SearchRegRepositoryModel searchRegByLastUsername(String usrnm,int res){
+		SearchRegRepositoryModel ret = new SearchRegRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibUsr.class, "user");	
+		crit.add(Restrictions.eq("sts", 0));
+		crit.addOrder(Order.asc("frstNm"));
+		crit.add(Restrictions.like("usrnm", usrnm, MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+
+
+}

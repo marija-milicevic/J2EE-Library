@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Nov 11, 2010 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.vicert.library.domain.LibRole" table="LIB_ROLE">
+    <meta attribute="generated-class" inherit="false">com.vicert.library.domain.base.LibRoleBase</meta>
+		<id name="roleId" type="integer">
+			<column name="ROLE_ID" precision="22" scale="0" />
+			<generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+			<param name="sequence_name">IDROLEAUTOINC</param>
+			<param name="increment_size">0</param>
+			<param name="optimizer">pooled</param>
+			</generator>
+		</id>
+        <property name="roleNm" type="string">
+            <column name="ROLE_NM" length="20" not-null="true" />
+        </property>
+        <set name="libUsrs" table="LIB_USR" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ROLE_ID" precision="22" scale="0" />
+            </key>
+            <one-to-many class="com.vicert.library.domain.LibUsr" />
+        </set>
+    </class>
+</hibernate-mapping>

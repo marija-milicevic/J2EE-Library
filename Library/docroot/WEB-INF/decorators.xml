@@ -1,0 +1,14 @@
+<decorators defaultdir="/WEB-INF/decorators">
+	
+	<decorator name="login" page="login.jsp">
+		<pattern>/loginPage.htm</pattern>
+		<pattern>/loginPage.htm**</pattern>	
+		<pattern>/registrationPage.htm</pattern>
+		<pattern>/register.htm</pattern>
+	</decorator>
+	
+	<decorator name="mangment" page="managment.jsp">	
+		<pattern>/**</pattern>			
+	</decorator>
+
+</decorators>

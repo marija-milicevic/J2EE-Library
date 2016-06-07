@@ -1,0 +1,35 @@
+10
+
+dir
+0
+svn://kc1/vicert/pilot/sinisa.djerasevic/config/com/uib
+svn://kc1/vicert/pilot
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+d2efec8c-5993-ba46-ab98-7d1e4df66645
+
+library
+dir
+
+
+
+add
+

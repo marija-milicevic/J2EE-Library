@@ -1,0 +1,128 @@
+package com.vicert.library.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.Validator;
+
+import com.vicert.library.model.AuthorModel;
+import com.vicert.library.model.BookModel;
+import com.vicert.library.service.BookServiceApi;
+
+public class BookValidator implements Validator {
+	
+	@Autowired
+	private BookServiceApi bookServiceApi;
+	private BookModel bookModel;
+	private AuthorModel authorModel;
+	private String errMessage;
+
+	@Override
+	public boolean supports(Class<? extends Object> clazz) {
+		return BookModel.class.isAssignableFrom(clazz);
+	}
+
+	@Override
+	public void validate(Object target, Errors errors) {
+	}
+	
+	public void validateBook(Object target, Errors errors, boolean isNew) {
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "titl", "field.required", "Titl required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "libAthrName", "field.required", "Author required");
+		if(errors.hasErrors()){
+			errMessage="Enter all text fields";
+			return;
+		}
+		bookModel = (BookModel) target;
+		if(bookModel.getCnt()<0){
+			errMessage="Remaining books must can't be negative number";
+			errors.reject("field.required");
+			return;
+		}
+		if(bookServiceApi.isBookActive(bookModel.getTitl(), bookModel.getBkId(), isNew)){
+			errMessage="Book with that title already exists";
+			errors.reject("field.required");
+			return;
+		}
+		if(bookServiceApi.isExistingImg(bookModel.getImg(), bookModel.getBkId(), isNew)){
+			errMessage="Book with that image already exists";
+			errors.reject("field.required");
+			return;
+		}
+		
+	}
+	
+	public void validateAuthor(Object target, Errors errors, boolean isNew){
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "athrNm", "field.required", "Author name required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "dtOfBthString", "field.required", "Date of birth required");
+		if(errors.hasErrors()){
+			errMessage="Enter all text fields";
+			return;
+		}
+		authorModel = (AuthorModel) target;
+		if(!isValidDate(authorModel.getDtOfBthString())){
+			errMessage="Date is not valid(needed yyyy-mm-dd)";
+			errors.reject("field.required");
+			return;
+		}
+		if(bookServiceApi.isAuthorActive(authorModel.getAthrNm(), authorModel.getAthrId(), isNew)){
+			errMessage="Author with that name already exists";
+			errors.reject("field.required");
+			return;
+		}
+	}
+
+	//GETTERS AND SETTERS
+	
+	public void setBookServiceApi(BookServiceApi bookServiceApi) {
+		this.bookServiceApi = bookServiceApi;
+	}
+	
+	public BookServiceApi getBookServiceApi() {
+		return bookServiceApi;
+	}
+	public BookModel getBookModel() {
+		return bookModel;
+	}
+
+	public void setBookModel(BookModel bookModel) {
+		this.bookModel = bookModel;
+	}
+
+	public String getErrMessage() {
+		return errMessage;
+	}
+
+	public void setErrMessage(String errMessage) {
+		this.errMessage = errMessage;
+	}
+	
+	//UTILITIES METHOD
+	
+	public boolean isValidDate(String inDate) {
+
+	    if (inDate == null)
+	      return false;
+
+	    //set the format to use as a constructor argument
+	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	    
+	    if (inDate.trim().length() != dateFormat.toPattern().length())
+	      return false;
+
+	    dateFormat.setLenient(false);
+	    
+	    try {
+	      //parse the inDate parameter
+	      dateFormat.parse(inDate.trim());
+	    }
+	    catch (ParseException pe) {
+	      return false;
+	    }
+	    return true;
+	  }
+
+}

@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.vicert.library.domain;
+
+import com.vicert.library.domain.base.LibRntBase;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class LibRnt extends LibRntBase {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6574795648264574942L;
+
+}

@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.vicert.library.domain;
+
+import com.vicert.library.domain.base.LibUsrBase;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class LibUsr extends LibUsrBase {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3900540256515305377L;
+
+}

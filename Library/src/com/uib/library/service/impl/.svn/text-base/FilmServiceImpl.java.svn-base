@@ -1,0 +1,382 @@
+package com.vicert.library.service.impl;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.vicert.library.domain.LibAthr;
+import com.vicert.library.domain.LibBk;
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.LibUsr;
+import com.vicert.library.domain.base.LibRntId;
+import com.vicert.library.model.AuthorModel;
+import com.vicert.library.model.BookModel;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchAuthorRepositoryModel;
+import com.vicert.library.model.SearchAuthorServiceModel;
+import com.vicert.library.model.SearchBookRepositoryModel;
+import com.vicert.library.model.SearchBookServiceModel;
+import com.vicert.library.repository.BookRepositoryApi;
+import com.vicert.library.repository.UserRepositoryApi;
+import com.vicert.library.service.BookServiceApi;
+
+@Transactional
+@TransactionConfiguration(transactionManager="transactionManager")
+public class BookServiceImpl implements BookServiceApi {
+	
+	private BookRepositoryApi bookRepositoryApi;
+	private UserRepositoryApi userRepositoryApi;
+
+	@SuppressWarnings("unchecked")
+	public List<BookModel> getAllBooks() {
+		List<LibBk> list = (List<LibBk>)bookRepositoryApi.listAll(LibBk.class);			
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:list){
+			retlist.add(createBookModel(libBk));
+		}
+		return retlist;
+	}
+	
+	public List<BookModel> getBooksByGrid(GridModel grid){
+		List<LibBk> list = (List<LibBk>)bookRepositoryApi.getBooksByGrid(grid);			
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:list){
+			retlist.add(createBookModel(libBk));
+		}
+		return retlist;
+	}
+	
+	public BookModel getBookModelByBookId(int bkId) {
+		LibBk libBk = bookRepositoryApi.getBookById(bkId);
+		if(libBk==null){return null;}
+		return createBookModel(libBk);
+	}
+
+	public List<BookModel> getAvailableBooks() {
+		List<LibBk> list = bookRepositoryApi.getAvailableBooks();
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:list){
+			retlist.add(createBookModel(libBk));
+		}
+		return retlist;
+	}
+	
+	public List<BookModel> getAvailableBooksBooksByGrid(GridModel grid){
+		List<LibBk> list = (List<LibBk>)bookRepositoryApi.getAvailableBooksBooksByGrid(grid);			
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:list){
+			retlist.add(createBookModel(libBk));
+		}
+		return retlist;
+	}
+	
+	public int getNumOfBooks(){
+		return bookRepositoryApi.getNumOfBooks();
+	}
+	
+	public int getNumOfAvailableBooks(){
+		return bookRepositoryApi.getNumOfAvailableBooks();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<AuthorModel> getAllAuthors() {
+		List<LibAthr> list = (List<LibAthr>) bookRepositoryApi.listAll(LibAthr.class);
+		ArrayList<AuthorModel> retlist = new ArrayList<AuthorModel>();
+		for(LibAthr libAthr:list){
+			retlist.add(createAuthorModel(libAthr));
+		}
+		return retlist;
+	}
+	
+	public List<AuthorModel> getAuthorsByGrid(GridModel grid){
+		List<LibAthr> list = (List<LibAthr>)bookRepositoryApi.getAuthorsByGrid(grid);			
+		ArrayList<AuthorModel> retlist = new ArrayList<AuthorModel>();
+		for(LibAthr libAthr:list){
+			retlist.add(createAuthorModel(libAthr));
+		}
+		return retlist;
+	}
+	
+	public int getNumOfAuthors(){
+		return bookRepositoryApi.getNumOfAuthors();
+	}
+	
+	@Override
+	public AuthorModel getAuthorModelByAuthorId(int athrId) {
+		LibAthr libAthr = bookRepositoryApi.getAuthorById(athrId);	
+		if(libAthr==null){return null;}
+		return createAuthorModel(libAthr);
+	}
+	
+
+	public void insertBook(BookModel bookModel) {
+		LibBk libBk = new LibBk();
+		libBk.setTitl(bookModel.getTitl());
+		libBk.setImg(bookModel.getImg());
+		libBk.setCnt(bookModel.getCnt());
+		libBk.setLibAthr(bookRepositoryApi.getAuthorByName(bookModel.getLibAthrName()));
+		libBk.setCreatUsrId(bookModel.getUpdtUsrId());
+		libBk.setCreatDt(Calendar.getInstance().getTime());
+		bookRepositoryApi.save(libBk);
+	}
+
+	public void updateBook(BookModel bookModel) {
+		LibBk libBk = new LibBk();
+		libBk.setBkId(bookModel.getBkId());
+		libBk.setTitl(bookModel.getTitl());
+		libBk.setImg(bookModel.getImg());
+		libBk.setCnt(bookModel.getCnt());
+		libBk.setLibAthr(bookRepositoryApi.getAuthorByName(bookModel.getLibAthrName()));
+		libBk.setCreatUsrId(bookModel.getCreatUsrId());
+		libBk.setCreatDt(bookModel.getCreatDt());
+		libBk.setUpdtUsrId(bookModel.getUpdtUsrId());
+		libBk.setUpdtDt(Calendar.getInstance().getTime());	
+		bookRepositoryApi.saveOrUpdate(libBk);
+	}
+	
+	@Override
+	public boolean isBookActive(String bookName, int bkId, boolean isNew) {
+		List<LibBk> list = bookRepositoryApi.getBooksByTitleExceptId(bookName, bkId, isNew);
+		if(list==null || list.isEmpty()){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	@Override
+	public boolean isExistingImg(String img, int bkId, boolean isNew) {
+		List<LibBk> list = bookRepositoryApi.getBooksByImgExceptId(img, bkId, isNew);
+		if(list==null || list.isEmpty()){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	@Override
+	public void deleteBookById(int bkId) {
+		bookRepositoryApi.delete(bookRepositoryApi.getBookById(bkId));
+	}
+	
+	@Override
+	public void insertAuthor(AuthorModel authorModel) {
+		LibAthr libAthr = new LibAthr();
+		libAthr.setAthrNm(authorModel.getAthrNm());
+		libAthr.setDtOfBth(authorModel.getDtOfBth());
+		libAthr.setCreatDt(Calendar.getInstance().getTime());
+		libAthr.setCreatUsrId(authorModel.getUpdtUsrId());
+		bookRepositoryApi.save(libAthr);
+	}
+
+	@Override
+	public void updateAuthor(AuthorModel authorModel) {
+		LibAthr libAthr = new LibAthr();
+		libAthr.setAthrId(authorModel.getAthrId());
+		libAthr.setAthrNm(authorModel.getAthrNm());
+		libAthr.setDtOfBth(authorModel.getDtOfBth());
+		libAthr.setCreatDt(authorModel.getCreatDt());
+		libAthr.setCreatUsrId(authorModel.getCreatUsrId());
+		libAthr.setUpdtDt(Calendar.getInstance().getTime());
+		libAthr.setUpdtUsrId(authorModel.getUpdtUsrId());
+		bookRepositoryApi.saveOrUpdate(libAthr);
+	}
+	
+	@Override
+	public boolean isAuthorActive(String authrName, int athrId,boolean isNew) {
+		List<LibAthr> list = bookRepositoryApi.getAuthorsByNameExceptId(authrName, athrId, isNew);
+		if(list==null || list.isEmpty()){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	@Override
+	public void delteAuthorById(int athrId) {
+		bookRepositoryApi.delete(bookRepositoryApi.getAuthorById(athrId));		
+	}
+	
+	@Override
+	public int rentBook(int usrId, int bkId) {
+		LibBk libBk = bookRepositoryApi.getBookById(bkId);
+		LibUsr libUsr = userRepositoryApi.getUserById(usrId);		
+		LibRntId libRntId = new LibRntId(bkId,usrId);
+		if(libBk.getCnt()==0){
+			return 2;
+		}
+		if(bookRepositoryApi.getRentByRntId(libRntId).isEmpty()){
+			LibRnt libRnt = new LibRnt();
+			libRnt.setLibBk(libBk);
+			libRnt.setLibUsr(libUsr);
+			libRnt.setDtOfRnt(Calendar.getInstance().getTime());
+			libRnt.setId(libRntId);
+			libUsr.setNbrOfAllowBk(libUsr.getNbrOfAllowBk()-1);
+			libBk.setCnt(libBk.getCnt()-1);
+			bookRepositoryApi.save(libRnt);
+			bookRepositoryApi.saveOrUpdate(libBk);
+			userRepositoryApi.saveOrUpdate(libUsr);
+			return 0;
+		}		
+		return 1;
+	}
+	
+	@Override
+	public void deleteRentsByUserId(int usrId) {	
+		List<LibRnt> list = userRepositoryApi.deleteRentsbyUsrId(usrId);
+		//update users allowed books
+		LibUsr libUsr = userRepositoryApi.getUserById(usrId);
+		libUsr.setNbrOfAllowBk(libUsr.getNbrOfAllowBk()+list.size());
+		userRepositoryApi.saveOrUpdate(libUsr);		
+		//for each book update count
+		for(LibRnt libRnt:list){
+			LibBk libBk = bookRepositoryApi.getBookById(libRnt.getId().getBkId());
+			libBk.setCnt(libBk.getCnt()+1);
+			bookRepositoryApi.saveOrUpdate(libBk);
+		}		
+	}
+	
+
+	@Override
+	public List<AuthorModel> getSortedAuthors(String sort) {
+		List<LibAthr> list = bookRepositoryApi.getSortedAuthors(sort);
+		ArrayList<AuthorModel> retlist = new ArrayList<AuthorModel>();
+		for(LibAthr libAthr:list){
+			retlist.add(createAuthorModel(libAthr));
+		}
+		return retlist;
+	}
+
+	@Override
+	public List<BookModel> getSortedBooks(String sort) {
+		List<LibBk> list = bookRepositoryApi.getSortedBooks(sort);			
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:list){
+			retlist.add(createBookModel(libBk));
+		}
+		return retlist;
+	}
+	
+	@Override
+	public SearchAuthorServiceModel searchAuthorsByName(String athrNm,int res) {
+		SearchAuthorServiceModel ret = new SearchAuthorServiceModel();
+		SearchAuthorRepositoryModel rep = bookRepositoryApi.searchAuthorByName(athrNm,res);
+		ArrayList<AuthorModel> retlist = new ArrayList<AuthorModel>();
+		for(LibAthr libAthr:rep.getList()){
+			retlist.add(createAuthorModel(libAthr));
+		}
+		ret.setList(retlist);
+		ret.setResults(rep.getResults());
+		return ret;
+	}
+	
+	@Override
+	public SearchBookServiceModel searchBookByTitle(String bkTitl,boolean rent,int res) {
+		SearchBookServiceModel ret = new SearchBookServiceModel();
+		SearchBookRepositoryModel rep = bookRepositoryApi.searchBookByTitle(bkTitl,rent,res);
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:rep.getList()){
+			retlist.add(createBookModel(libBk));
+		}
+		ret.setList(retlist);
+		ret.setResults(rep.getResults());
+		return ret;
+	}
+	
+	@Override
+	public SearchBookServiceModel searchBookCnt(String cnt,boolean rent,int res) {
+		SearchBookServiceModel ret = new SearchBookServiceModel();
+		SearchBookRepositoryModel rep = bookRepositoryApi.searchBookCnt(cnt,rent,res);
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:rep.getList()){
+			retlist.add(createBookModel(libBk));
+		}
+		ret.setList(retlist);
+		ret.setResults(rep.getResults());
+		return ret;
+	}
+	
+	@Override
+	public SearchBookServiceModel searchBookByAuthor(String athrNm,boolean rent,int res) {
+		SearchBookServiceModel ret = new SearchBookServiceModel();
+		SearchBookRepositoryModel rep = bookRepositoryApi.searchBookByAuthor(athrNm,rent,res);
+		ArrayList<BookModel> retlist = new ArrayList<BookModel>();
+		for(LibBk libBk:rep.getList()){
+			retlist.add(createBookModel(libBk));
+		}
+		ret.setList(retlist);
+		ret.setResults(rep.getResults());
+		return ret;
+	}	
+	
+	@Override
+	public void insertImgToBook(String img,int bkId) {
+		bookRepositoryApi.insertImgToBook(img,bkId);
+		
+	}
+
+	//GETTERS AND SETTERS
+	
+	public void setBookRepositoryApi(BookRepositoryApi bookRepositoryApi) {
+		this.bookRepositoryApi = bookRepositoryApi;
+	}
+
+	public BookRepositoryApi getBookRepositoryApi() {
+		return bookRepositoryApi;
+	}
+	
+	public UserRepositoryApi getUserRepositoryApi() {
+		return userRepositoryApi;
+	}
+
+	public void setUserRepositoryApi(UserRepositoryApi userRepositoryApi) {
+		this.userRepositoryApi = userRepositoryApi;
+	}
+	
+	//UTILITES METHODS
+	
+	private BookModel createBookModel(LibBk libBk){
+		BookModel bookModel = new BookModel();
+		bookModel.setBkId(libBk.getBkId());
+		bookModel.setCnt(libBk.getCnt());
+		bookModel.setCreatDt(libBk.getCreatDt());
+		bookModel.setCreatUsrId(libBk.getCreatUsrId());
+		bookModel.setCreatUsr(userRepositoryApi.getUserById(libBk.getCreatUsrId()).getUsrnm());
+		if(libBk.getLibAthr()!=null){
+			bookModel.setLibathr(libBk.getLibAthr());
+			bookModel.setLibAthrName(libBk.getLibAthr().getAthrNm());
+		}			
+		bookModel.setTitl(libBk.getTitl());	
+		bookModel.setImg(libBk.getImg());
+		if(libBk.getUpdtUsrId()!=null){
+			bookModel.setUpdtDt(libBk.getUpdtDt());
+			bookModel.setUpdtUsrId(libBk.getUpdtUsrId());
+			bookModel.setUpdtUsr(userRepositoryApi.getUserById(libBk.getUpdtUsrId()).getUsrnm());				
+		}
+		return bookModel;
+	}
+	
+	private AuthorModel createAuthorModel(LibAthr libAthr){
+		AuthorModel authorModel = new AuthorModel();
+		authorModel.setAthrId(libAthr.getAthrId());
+		authorModel.setAthrNm(libAthr.getAthrNm());
+		authorModel.setCreatDt(libAthr.getCreatDt());
+		authorModel.setCreatUsrId(libAthr.getCreatUsrId());
+		authorModel.setCreatUsr(userRepositoryApi.getUserById(libAthr.getCreatUsrId()).getUsrnm());
+		authorModel.setDtOfBth(libAthr.getDtOfBth());
+		if(libAthr.getUpdtUsrId()!=null){
+			authorModel.setUpdtDt(libAthr.getUpdtDt());
+			authorModel.setUpdtUsrId(libAthr.getUpdtUsrId());	
+			authorModel.setUpdtUsr(userRepositoryApi.getUserById(libAthr.getUpdtUsrId()).getUsrnm());
+		}		
+		return authorModel;
+	}
+
+}

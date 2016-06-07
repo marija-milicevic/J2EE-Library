@@ -1,0 +1,27 @@
+package com.vicert.library.model;
+
+import java.util.List;
+
+public class SearchBookServiceModel {
+	
+	private List<BookModel> list;
+	private int results;
+	
+	//GETTERS AND SETTERS
+	
+	public void setList(List<BookModel> list) {
+		this.list = list;
+	}
+	public List<BookModel> getList() {
+		return list;
+	}
+	public void setResults(int results) {
+		this.results = results;
+	}
+	public int getResults() {
+		return results;
+	}
+	
+	
+
+}

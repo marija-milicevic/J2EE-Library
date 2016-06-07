@@ -1,0 +1,48 @@
+package com.vicert.library.service;
+
+import java.util.List;
+
+import com.vicert.library.model.AuthorModel;
+import com.vicert.library.model.BookModel;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchAuthorServiceModel;
+import com.vicert.library.model.SearchBookServiceModel;
+
+public interface BookServiceApi {
+	
+	public List<BookModel> getAllBooks();
+	public List<BookModel> getBooksByGrid(GridModel grid);
+	public List<BookModel> getAvailableBooks();
+	public List<BookModel> getAvailableBooksBooksByGrid(GridModel grid);
+	public int getNumOfBooks();
+	public int getNumOfAvailableBooks();
+	public BookModel getBookModelByBookId(int bkId);
+	public void insertBook(BookModel bookModel);
+	public void updateBook(BookModel bookModel);
+	public boolean isBookActive(String bookName,int bkId,boolean isNew);
+	public boolean isExistingImg(String img,int bkId,boolean isNew);
+	public void deleteBookById(int bkId);
+	
+	public List<AuthorModel> getAllAuthors();
+	public List<AuthorModel> getAuthorsByGrid(GridModel grid);
+	public int getNumOfAuthors();
+	public AuthorModel getAuthorModelByAuthorId(int athrId);
+	public void insertAuthor(AuthorModel authorModel);
+	public void updateAuthor(AuthorModel authorModel);
+	public boolean isAuthorActive(String authrName,int athrId,boolean isNew);	
+	public void delteAuthorById(int athrId);
+	
+	public int rentBook(int usrId, int bkId);
+	public void deleteRentsByUserId(int usrId);
+	
+	public List<BookModel> getSortedBooks(String sort);
+	public List<AuthorModel> getSortedAuthors(String sort);
+	
+	public SearchAuthorServiceModel searchAuthorsByName(String athrNm,int res);
+	public SearchBookServiceModel searchBookByTitle(String bkTitl,boolean rent,int res);
+	public SearchBookServiceModel searchBookCnt(String cnt,boolean rent,int res);
+	public SearchBookServiceModel searchBookByAuthor(String athrNm,boolean rent,int res);
+	
+	public void insertImgToBook(String img,int bkId);
+
+}

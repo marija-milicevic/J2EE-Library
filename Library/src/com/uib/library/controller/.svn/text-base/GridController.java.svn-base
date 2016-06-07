@@ -1,0 +1,413 @@
+package com.vicert.library.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.vicert.library.domain.LibUsr;
+import com.vicert.library.model.AuthorModel;
+import com.vicert.library.model.BookModel;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchAuthorServiceModel;
+import com.vicert.library.model.SearchBookServiceModel;
+import com.vicert.library.model.SearchRegRepositoryModel;
+import com.vicert.library.service.BookServiceApi;
+import com.vicert.library.service.UserServiceApi;
+
+@Controller
+@SessionAttributes(value = {"usr","regList","bookList","authorList","grid"})
+public class GridController {
+	
+	@Autowired
+	private BookServiceApi bookServiceApi;
+	@Autowired
+	private UserServiceApi userServiceApi;
+	
+	//------------ PREVIOUS PAGE SECTION ------------
+	@RequestMapping("/prevPage")
+	public ModelAndView goToPrevPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		if(grid.getPageNumber()!=0){
+			grid.setPageNumber(grid.getPageNumber()-1);
+			modelAndView.addObject("grid",grid);
+			setListOnGrid(grid,modelAndView);
+		}
+		return modelAndView;
+	}
+	
+	//------------ NEXT PAGE SECTION ------------
+	@RequestMapping("/nextPage")
+	public ModelAndView goToNextPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		if(grid.getPageNumber()!=grid.getPages()){
+			grid.setPageNumber(grid.getPageNumber()+1);			
+			modelAndView.addObject("grid",grid);
+			setListOnGrid(grid,modelAndView);
+		}
+		return modelAndView;
+	}
+	
+	//------------ FIRST PAGE SECTION ------------
+	@RequestMapping("/firstPage")
+	public ModelAndView goToFirstPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		if(grid.getPageNumber()!=0){
+			grid.setPageNumber(0);
+			modelAndView.addObject("grid",grid);
+			setListOnGrid(grid,modelAndView);
+		}
+		return modelAndView;
+	}
+	
+	//------------ LAST PAGE SECTION ------------
+	@RequestMapping("/lastPage")
+	public ModelAndView goToLastPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		if(grid.getPageNumber()!=grid.getPages()){
+			grid.setPageNumber(grid.getPages());
+			modelAndView.addObject("grid",grid);
+			setListOnGrid(grid,modelAndView);
+		}		
+		return modelAndView;
+	}
+	
+	//------------ GO TO CUSTOM PAGE SECTION ------------
+	@RequestMapping("/customPage")
+	public ModelAndView goToCustomPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		modelAndView.addObject("grid",grid);
+		setListOnGrid(grid,modelAndView);
+		return modelAndView;
+	}
+	
+	//------------ SET ITEMS PER PAGE SECTION ------------
+	@RequestMapping("/itemsPage")
+	public ModelAndView setItemsPerPage(@ModelAttribute("grid") GridModel grid){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		grid.setPages((int)Math.ceil((double)grid.getItems()/(double)grid.getItemsPerPage())-1);
+		grid.setPageNumber(0);
+		modelAndView.addObject("grid",grid);
+		setListOnGrid(grid,modelAndView);
+		return modelAndView;
+	}	
+	
+	//------------ SORT SECTION ------------
+	@RequestMapping("/sort")
+	public ModelAndView sort(@ModelAttribute("grid") GridModel grid,String sort){
+		ModelAndView modelAndView = new ModelAndView(grid.getRetPage());
+		List<BookModel> listB = new ArrayList<BookModel>();
+		//sort books
+		if(sort.subSequence(0, 2).equals("bk")){	
+			//rented books
+			if(sort.contains("Rnt")){
+				setBookImgSort(sort.substring(6),grid);
+				grid.setCmpString(sort.substring(6));
+				listB = bookServiceApi.getAvailableBooksBooksByGrid(grid);
+			}
+			//book managment
+			else{
+				setBookImgSort(sort.substring(3),grid);
+				grid.setCmpString(sort.substring(3));
+				listB = bookServiceApi.getBooksByGrid(grid);
+			}						
+			modelAndView.addObject("bookList",listB);
+		}
+		//sort authors
+		else if(sort.subSequence(0, 2).equals("at")){
+			setAuthorImgSort(sort.substring(3),grid);
+			grid.setCmpString(sort.substring(3));			
+			List<AuthorModel> list = bookServiceApi.getAuthorsByGrid(grid);
+			modelAndView.addObject("authorList",list);
+		}
+		//sort registrations
+		else if(sort.subSequence(0, 2).equals("rg")){
+			setRegImgSort(sort.substring(3),grid);
+			grid.setCmpString(sort.substring(3));
+			List<LibUsr> list = userServiceApi.getInactiveUsersByGrid(grid);
+			modelAndView.addObject("regList",list);
+		}
+		modelAndView.addObject("grid",grid);
+		return modelAndView;
+	}
+	
+	//------------ SEARCH SECTION ------------
+	@RequestMapping("/searchFirstName")
+	public ModelAndView searchRegByFirstName(String frstNm,@ModelAttribute("grid") GridModel grid){
+		SearchRegRepositoryModel mod = userServiceApi.searchRegByFirstName(frstNm, grid.getItemsPerPage());
+		grid.setSearchString(!frstNm.equals("")? "frstNm"+frstNm : "");
+		ModelAndView mav = new ModelAndView("registrationManagment");
+		mav.addObject("regList",mod.getList());
+		editGrid(mod.getResults(),grid);
+		mav.addObject("grid",grid);
+		return mav;
+	}
+	
+	@RequestMapping("/searchLastName")
+	public ModelAndView searchRegByLastName(String lstNm,@ModelAttribute("grid") GridModel grid){
+		SearchRegRepositoryModel mod = userServiceApi.searchRegByFirstName(lstNm, grid.getItemsPerPage());
+		grid.setSearchString(!lstNm.equals("")? "lstNm"+lstNm : "");
+		ModelAndView mav = new ModelAndView("registrationManagment");
+		mav.addObject("regList",mod.getList());
+		editGrid(mod.getResults(),grid);
+		mav.addObject("grid",grid);
+		return mav;
+	}
+	
+	@RequestMapping("/searchUsername")
+	public ModelAndView searchRegByUsername(String usrnm,@ModelAttribute("grid") GridModel grid){
+		SearchRegRepositoryModel mod = userServiceApi.searchRegByFirstName(usrnm, grid.getItemsPerPage());
+		grid.setSearchString(!usrnm.equals("")? "usrnm"+usrnm : "");
+		ModelAndView mav = new ModelAndView("registrationManagment");
+		mav.addObject("regList",mod.getList());
+		editGrid(mod.getResults(),grid);
+		mav.addObject("grid",grid);
+		return mav;
+	}
+	
+	@RequestMapping("/searchAuthor")
+	public ModelAndView searchAuthorByName(String athrNm,@ModelAttribute("grid") GridModel grid){
+		SearchAuthorServiceModel mod = bookServiceApi.searchAuthorsByName(athrNm, grid.getItemsPerPage());
+		grid.setSearchString(!athrNm.equals("")? "athrNm_"+athrNm : "");
+		ModelAndView mav = new ModelAndView("authorManagment");
+		mav.addObject("authorList",mod.getList());
+		editGrid(mod.getResults(),grid);
+		mav.addObject("grid",grid);
+		return mav;
+	}
+	
+	@RequestMapping("/searchBook")
+	public ModelAndView searchBookByTitle(String bkTitl, String retPage, @ModelAttribute("grid") GridModel grid){
+		SearchBookServiceModel mod =  bookServiceApi.searchBookByTitle(bkTitl,retPage.equals("bookRent"),grid.getItemsPerPage());
+		grid.setSearchString(!bkTitl.equals("")? "titl_"+bkTitl : "");
+		return getBookSearchMAV(mod.getList(),grid,retPage,mod.getResults());
+	}
+	
+	@RequestMapping("/searchCnt")
+	public ModelAndView searchBookByCnt(String bkCnt, String retPage, @ModelAttribute("grid") GridModel grid){
+		try{
+			Integer.parseInt(bkCnt);			
+		}catch (NumberFormatException e) {
+			bkCnt="";
+		}		
+		SearchBookServiceModel mod =  bookServiceApi.searchBookCnt(bkCnt,retPage.equals("bookRent"),grid.getItemsPerPage());
+		grid.setSearchString(!bkCnt.equals("")? "cnt_"+bkCnt : "");
+		return getBookSearchMAV(mod.getList(),grid,retPage,mod.getResults());
+	}	
+	
+	@RequestMapping("/searchAuthorBook")
+	public ModelAndView searchBookByAuthor(String athrNm, String retPage, @ModelAttribute("grid") GridModel grid){
+		SearchBookServiceModel mod =  bookServiceApi.searchBookByAuthor(athrNm,retPage.equals("bookRent"),grid.getItemsPerPage());
+		grid.setSearchString(!athrNm.equals("")? "libAthr_"+athrNm : "");
+		return getBookSearchMAV(mod.getList(),grid,retPage,mod.getResults());
+	}
+	
+	//GETTERS AND SETTERS
+	
+	public void setBookServiceApi(BookServiceApi bookServiceApi) {
+		this.bookServiceApi = bookServiceApi;
+	}
+	public BookServiceApi getBookServiceApi() {
+		return bookServiceApi;
+	}
+	public void setUserServiceApi(UserServiceApi userServiceApi) {
+		this.userServiceApi = userServiceApi;
+	}
+	public UserServiceApi getUserServiceApi() {
+		return userServiceApi;
+	}
+	
+	//UTILITES METHODS
+	
+	private void editGrid(int items, GridModel grid){
+		grid.setItems(items);	
+		grid.setPages(((int)Math.ceil((double)grid.getItems()/(double)grid.getItemsPerPage())-1));
+		grid.setPageNumber(0);
+	}
+	
+	private ModelAndView getBookSearchMAV(List<BookModel> list, GridModel grid, String retPage,int size){
+		ModelAndView mav = new ModelAndView(retPage);
+		mav.addObject("bookList",list);
+		editGrid(size,grid);
+		mav.addObject("grid",grid);
+		return mav;
+	}
+	
+	private void setListOnGrid(GridModel grid,ModelAndView mav){
+		if(grid.getRetPage().contains("registration")){
+			mav.addObject("regList", userServiceApi.getInactiveUsersByGrid(grid));
+		}
+		else if(grid.getRetPage().contains("author")){
+			mav.addObject("authorList",bookServiceApi.getAuthorsByGrid(grid));
+		}
+		else if(grid.getRetPage().contains("Rent")){
+			mav.addObject("bookList",bookServiceApi.getAvailableBooksBooksByGrid(grid));
+		}
+		else{
+			mav.addObject("bookList",bookServiceApi.getBooksByGrid(grid));
+		}
+	}
+	
+	private void setRegImgSort(String sort,GridModel grid){
+		//first name
+		if(sort.equals("frstNm")){
+			grid.setSortRegFirstName( (grid.getSortRegFirstName()+1)%2 );
+			grid.setSortDesc(grid.getSortRegFirstName()==0 ? true : false);
+		}
+		else{
+			grid.setSortRegFirstName(2);
+		}
+		//last name
+		if(sort.equals("lstNm")){
+			grid.setSortRegLastName( (grid.getSortRegLastName()+1)%2 );
+			grid.setSortDesc(grid.getSortRegLastName()==0 ? true : false);
+		}
+		else{
+			grid.setSortRegLastName(2);
+		}
+		//username
+		if(sort.equals("usrnm")){
+			grid.setSortRegUsername( (grid.getSortRegUsername()+1)%2 );
+			grid.setSortDesc(grid.getSortRegUsername()==0 ? true : false);
+		}
+		else{
+			grid.setSortRegUsername(2);
+		}
+	}
+	
+	private void setAuthorImgSort(String sort,GridModel grid){
+		//author name
+		if(sort.equals("athrNm")){
+			grid.setSortAthrName( (grid.getSortAthrName()+1)%2 );
+			grid.setSortDesc(grid.getSortAthrName()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrName(2);
+		}
+		//author date of birth
+		if(sort.equals("dtOfBth")){
+			grid.setSortAthrDateOfBirth( (grid.getSortAthrDateOfBirth()+1)%2 );	
+			grid.setSortDesc(grid.getSortAthrDateOfBirth()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrDateOfBirth(2);			
+		}
+		
+		//author create date
+		if(sort.equals("creatDt")){
+			grid.setSortAthrCreateDate( (grid.getSortAthrCreateDate()+1)%2 );	
+			grid.setSortDesc(grid.getSortAthrCreateDate()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrCreateDate(2);			
+		}
+		
+		//author update date
+		if(sort.equals("updtDt")){
+			grid.setSortAthrUpdateDate( (grid.getSortAthrUpdateDate()+1)%2 );	
+			grid.setSortDesc(grid.getSortAthrUpdateDate()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrUpdateDate(2);			
+		}
+		
+		//author create user
+		if(sort.equals("creatUsrId")){
+			grid.setSortAthrCreateUser( (grid.getSortAthrCreateUser()+1)%2 );
+			grid.setSortDesc(grid.getSortAthrCreateUser()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrCreateUser(2);
+		}
+		
+		//author update user
+		if(sort.equals("updtUsrId")){
+			grid.setSortAthrUpdateUser( (grid.getSortAthrUpdateUser()+1)%2 );
+			grid.setSortDesc(grid.getSortAthrUpdateUser()==0 ? true : false);
+		}
+		else{
+			grid.setSortAthrUpdateUser(2);
+		}
+		
+	}
+	
+	private void setBookImgSort(String sort,GridModel grid){
+		//book title
+		if(sort.equals("titl")){
+			grid.setSortBookTitle( (grid.getSortBookTitle()+1)%2 );
+			grid.setSortDesc(grid.getSortBookTitle()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookTitle(2);
+		}
+		
+		//book number
+		if(sort.equals("cnt")){
+			grid.setSortBookCount( (grid.getSortBookCount()+1)%2 );
+			grid.setSortDesc(grid.getSortBookCount()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookCount(2);
+		}
+		
+		//book author name
+		if(sort.equals("libAthr")){
+			grid.setSortBookAthrName( (grid.getSortBookAthrName()+1)%2 );
+			grid.setSortDesc(grid.getSortBookAthrName()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookAthrName(2);
+		}
+		
+		//book create date
+		if(sort.equals("creatDt")){
+			grid.setSortBookCreateDate( (grid.getSortBookCreateDate()+1)%2 );
+			grid.setSortDesc(grid.getSortBookCreateDate()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookCreateDate(2);
+		}
+		
+		//book create date
+		if(sort.equals("updtDt")){
+			grid.setSortBookUpdateDate( (grid.getSortBookUpdateDate()+1)%2 );
+			grid.setSortDesc(grid.getSortBookUpdateDate()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookUpdateDate(2);
+		}
+		
+		//book create user
+		if(sort.equals("creatUsrId")){
+			grid.setSortBookCreateUser( (grid.getSortBookCreateUser()+1)%2 );
+			grid.setSortDesc(grid.getSortBookCreateUser()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookCreateUser(2);
+		}
+		
+		//book update user
+		if(sort.equals("updtUsrId")){
+			grid.setSortBookUpdateUser( (grid.getSortBookUpdateUser()+1)%2 );
+			grid.setSortDesc(grid.getSortBookUpdateUser()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookUpdateUser(2);
+		}
+		
+		//book image
+		if(sort.equals("img")){
+			grid.setSortBookImage( (grid.getSortBookImage()+1)%2 );
+			grid.setSortDesc(grid.getSortBookImage()==0 ? true : false);
+		}
+		else{
+			grid.setSortBookImage(2);
+		}
+	}
+
+}

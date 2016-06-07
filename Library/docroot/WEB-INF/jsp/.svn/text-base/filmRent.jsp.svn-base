@@ -1,0 +1,109 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="java.util.*" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Book rent page</title>
+<link rel="stylesheet" href="css/jQueryUiCSS/jquery-ui-1.8.6.custom.css" type="text/css" media="screen" charset="utf-8" />
+<script type="text/javascript" src="<c:url value="/js/jquery-1.4.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.6.custom.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/confirmMessage.js"/>"></script>
+</head>
+<body>
+
+				<c:if test="${empty bookList}">
+					No books available
+				</c:if>
+				<c:if test="${not empty bookList}">
+				<table>
+				<thead>
+					<tr>						
+						 <th>Image</th> 
+				         <th>
+				         	<a href="sort.htm?sort=bk_Rnttitl">Book title</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookTitle}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_Rntcnt">Num</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookCount}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_RntlibAthr">Author</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookAthrName}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>Rent</th>				         
+				    </tr>
+				</thead>
+				<c:forEach var="book" items="${bookList}">
+				        <tr>		
+				          <td style="background-color: #127a78; 160;height: 160;vertical-align: middle;padding-top: 20px">
+						  <c:choose>
+							<c:when test="${not empty book.img}">
+								<img style="width: 135;height: 135;" src="${book.img}"></img>
+							</c:when>
+							<c:otherwise>
+								<p align="center">No Image Available</p>
+							</c:otherwise>
+						  </c:choose>
+				          </td>	 			          
+				          <td style="vertical-align: middle">${book.titl}</td>
+				          <td style="vertical-align: middle">${book.cnt}</td>		
+				          <td style="vertical-align: middle">${book.libAthrName}</td>					                   
+						  <td style="vertical-align: middle">
+						  <form action="bookRent.htm" method="post" id="rentBook${usr.id}">						  
+						  <input type="hidden" name="usrId" value="${usr.id}">
+						  <input type="hidden" name="bkId" value="${book.bkId}"> 
+						  <input type="hidden" name="bkImg" value="${book.img}">   
+						  <input type="hidden" name="allBk" value="${usr.allowedBooks}">						  						  
+						  <button type="submit">Rent</button>
+						  </form>
+						  </td>						 
+				        </tr>
+				</c:forEach>
+				<thead>	
+					<tr>
+						<th style="background-color: white;"></th>
+						<th>
+							<form action="searchBook.htm?retPage=bookRent" method="post">
+							<input style="width: 100px" type="text" name="bkTitl">
+							</form>
+						</th>
+						<th>
+							<form action="searchCnt.htm?retPage=bookRent" method="post">
+							<input style="width: 30px" type="text" name="bkCnt">
+							</form>
+						</th>
+						<th>
+							<form action="searchAuthorBook.htm?retPage=bookRent" method="post">
+							<input style="width: 100px" type="text" name="athrNm">
+							</form>
+						</th>				
+					</tr>		
+				</thead>		
+				</table>
+				
+				<c:import url="/WEB-INF/jsp/pager.jsp"></c:import>	
+				
+				</c:if>	
+	
+				<div id="dialog-message" title="Book rent" style="display: none;">
+					<p align="center" id="err">${rentInfo}</p>	
+					<p align="center">
+					<c:if test="${not empty rentImg}">
+					<img style="width: 135;height: 135;" src="${rentImg}"></img>
+					</c:if>
+				  	</p>	
+				</div>				
+
+</body>
+</html>

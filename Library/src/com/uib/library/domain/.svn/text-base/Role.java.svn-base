@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.vicert.library.domain;
+
+import com.vicert.library.domain.base.LibRoleBase;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class LibRole extends LibRoleBase {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7969153815889159544L;
+
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+  <class name="com.uib.library.domain.Film" table="film">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.FilmBase</meta>
+    <id name="filmID" column="film_id" type="integer">
+      <generator class="increment"/>
+    </id>
+    <many-to-one class="com.uib.library.domain.Director" fetch="select" name="director">
+      <column name="director_id" precision="22" scale="0"/>
+    </many-to-one>
+    <property name="titl" type="string">
+      <column length="100" name="titl" not-null="true"/>
+    </property>
+    <property name="genre" type="string">
+      <column length="20" name="genre"/>
+    </property>
+    <property name="star" type="integer">
+      <column name="star" precision="22" scale="0"/>
+    </property>
+    <property name="img" type="string">
+      <column length="100" name="img"/>
+    </property>
+    <property name="cnt" type="integer">
+      <column name="cnt" not-null="true" precision="22" scale="0"/>
+    </property>
+    <property name="creatDt" type="date">
+      <column length="7" name="dt_creat" not-null="true"/>
+    </property>
+    <property name="updtDt" type="date">
+      <column length="7" name="dt_updt"/>
+    </property>
+    <property name="creatUsrId" type="integer">
+      <column name="creat_user_id" not-null="true" precision="22" scale="0"/>
+    </property>
+    <property name="updtUsrId" type="integer">
+      <column name="updt_usr_id" precision="22" scale="0"/>
+    </property>
+    <set fetch="select" inverse="true" lazy="true" name="rents" table="rent">
+      <key>
+        <column name="film_id" not-null="true" precision="22" scale="0"/>
+      </key>
+      <one-to-many class="com.uib.library.domain.Rent"/>
+    </set>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.vicert.library.domain;
+
+import com.vicert.library.domain.base.LibAthrBase;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class LibAthr extends LibAthrBase {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -633696818228164782L;
+
+}

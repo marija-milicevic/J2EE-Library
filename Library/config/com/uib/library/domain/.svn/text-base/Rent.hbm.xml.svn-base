@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Nov 11, 2010 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.vicert.library.domain.LibRnt" table="LIB_RNT">
+    <meta attribute="generated-class" inherit="false">com.vicert.library.domain.base.LibRntBase</meta>
+        <composite-id name="id" class="com.vicert.library.domain.base.LibRntId">
+            <key-property name="bkId" type="integer">
+                <column name="BK_ID" precision="22" scale="0" />
+            </key-property>
+            <key-property name="usrId" type="integer">
+                <column name="USR_ID" precision="22" scale="0" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="libUsr" class="com.vicert.library.domain.LibUsr" update="false" insert="false" fetch="select">
+            <column name="USR_ID" precision="22" scale="0" not-null="true" />
+        </many-to-one>
+        <many-to-one name="libBk" class="com.vicert.library.domain.LibBk" update="false" insert="false" fetch="select">
+            <column name="BK_ID" precision="22" scale="0" not-null="true" />
+        </many-to-one>
+        <property name="dtOfRnt" type="date">
+            <column name="DT_OF_RNT" length="7" not-null="true" />
+        </property>
+        <property name="dtOfRet" type="date">
+            <column name="DT_OF_RET" length="7" />
+        </property>
+    </class>
+</hibernate-mapping>

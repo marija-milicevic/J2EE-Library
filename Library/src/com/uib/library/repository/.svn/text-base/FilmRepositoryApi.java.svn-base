@@ -1,0 +1,45 @@
+package com.vicert.library.repository;
+
+import java.util.List;
+
+import com.vicert.library.domain.LibAthr;
+import com.vicert.library.domain.LibBk;
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.base.LibRntId;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchAuthorRepositoryModel;
+import com.vicert.library.model.SearchBookRepositoryModel;
+
+public interface BookRepositoryApi extends BaseRepositoryApi{
+	
+	public List<LibBk> getAvailableBooks();	
+	public List<LibBk> getBooksByGrid(GridModel grid);
+	public List<LibBk> getAvailableBooksBooksByGrid(GridModel grid);
+	public List<LibBk> getBooksByTitleExceptId(String titl,int bkId,boolean isNew);
+	public List<LibBk> getBooksByImgExceptId(String img,int bkId,boolean isNew);
+	public LibBk getBookById(int bkId);
+	public int getNumOfBooks();
+	public int getNumOfAvailableBooks();
+	
+	public List<LibAthr> getAuthorsByNameExceptId(String athrName, int athrId, boolean isNew);
+	public List<LibAthr> getAuthorsByGrid(GridModel grid);
+	public int getNumOfAuthors();
+	public LibAthr getAuthorByName(String authorName);	
+	public LibAthr getAuthorById(int athrId);
+	
+	public void deleteAllAuthors();
+	public void deleteAllBooks();
+	
+	public List<LibRnt> getRentByRntId(LibRntId rntId);
+	
+	public List<LibBk> getSortedBooks(String sort);
+	public List<LibAthr> getSortedAuthors(String sort);
+	
+	public SearchAuthorRepositoryModel searchAuthorByName(String athrNm,int res);
+	public SearchBookRepositoryModel searchBookByTitle(String bkTitl,boolean rent,int res);
+	public SearchBookRepositoryModel searchBookCnt(String cnt,boolean rent,int res);
+	public SearchBookRepositoryModel searchBookByAuthor(String athrNm,boolean rent,int res);
+	
+	public void insertImgToBook(String img,int bkId);
+
+}

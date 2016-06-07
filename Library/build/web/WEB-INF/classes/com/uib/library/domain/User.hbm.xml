@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.uib.library.domain.User" table="user">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.UserBase</meta>
+        <id name="usrId" column="user_id" type="integer">
+            <!--<column name="user_id" precision="22" scale="0"/>-->
+            <generator class="increment"/>
+        </id>
+        <many-to-one name="libRole" class="com.uib.library.domain.Role" fetch="select" >
+            <column name="role_id" precision="22" scale="0" />
+        </many-to-one>
+        <property name="frstNm" type="string">
+            <column name="frst_nm" length="20" not-null="true" />
+        </property>
+        <property name="lstNm" type="string">
+            <column name="last_nm" length="20" not-null="true" />
+        </property>
+        <property name="usrnm" type="string">
+            <column name="user_nm" length="20" not-null="true" />
+        </property>
+        <property name="pswd" type="string">
+            <column name="pswd" length="20" not-null="true" />
+        </property>
+		<property name="md5Pswd" type="string">
+            <column name="MD5_pswd" length="32" />
+        </property>
+		<property name="email" type="string">
+            <column name="email" length="50" />
+        </property>
+        <property name="sts" type="integer">
+            <column name="sts" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="nbrOfAllowFilms" type="integer">
+            <column name="nbr_of_allow_fm" precision="22" scale="0" />
+        </property>
+        <set name="libRnts" table="rent" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="user_id" precision="22" scale="0" not-null="true" />
+            </key>
+            <one-to-many class="com.uib.library.domain.Rent" />
+        </set>
+    </class>
+</hibernate-mapping>

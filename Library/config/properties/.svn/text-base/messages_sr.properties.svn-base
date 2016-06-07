@@ -1,0 +1,6 @@
+menu.home = Glavna strana
+menu.regs = Pregled registracija
+menu.auth = Pregled autora
+menu.book = Pregled knjiga
+menu.rent = Iznajmljivanje knjiga
+menu.lgot = Odjavljivanje

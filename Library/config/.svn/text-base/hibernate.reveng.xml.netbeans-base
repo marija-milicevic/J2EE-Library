@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+  <table-filter match-name="LIB_ATHR"/>
+  <table-filter match-name="LIB_BK"/>
+  <table-filter match-name="LIB_RNT"/>
+  <table-filter match-name="LIB_ROLE"/>
+  <table-filter match-name="LIB_USR"/>
+</hibernate-reverse-engineering>

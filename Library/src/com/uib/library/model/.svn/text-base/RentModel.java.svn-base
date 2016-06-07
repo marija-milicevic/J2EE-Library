@@ -1,0 +1,45 @@
+package com.vicert.library.model;
+
+import java.util.Date;
+
+public class RentModel {
+	
+	private String titl;
+	private String author;
+	private Date dateOfRent;
+	
+	//GETTERS AND SETTERS
+	
+	public void setTitl(String titl) {
+		this.titl = titl;
+	}
+	public String getTitl() {
+		return titl;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setDateOfRent(Date dateOfRent) {
+		this.dateOfRent = dateOfRent;
+	}
+	public Date getDateOfRent() {
+		return dateOfRent;
+	}
+	
+	// UTILITIES METHODS
+    
+    public String toString(){       
+    	String ret="------------ Rent ------------\n";
+    	ret+=  "Titl: " + titl  +"\n";
+    	ret+=  "Athr: " + author  +"\n";
+    	ret+=  "DtRt: " + dateOfRent  +"\n";
+    	ret+=	"------------------------------\n";
+    	return ret;
+    }
+	
+	
+
+}

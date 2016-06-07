@@ -1,0 +1,151 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="java.util.*" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Book managment page</title>
+<link rel="stylesheet" href="css/jQueryUiCSS/jquery-ui-1.8.6.custom.css" type="text/css" media="screen" charset="utf-8" />
+<script type="text/javascript" src="<c:url value="/js/jquery-1.4.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/jquery-ui-1.8.6.custom.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/deleteBookDialog.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/confirmMessage.js"/>"></script>
+</head>
+<body>
+
+				<c:if test="${empty bookList}">
+					No books available
+				</c:if>
+				<c:if test="${not empty bookList}">
+				<table>
+				<thead>
+					<tr>
+				         <th>
+				         	<a href="sort.htm?sort=bk_titl">Book title</a>
+				         	<br/><br/>
+				         	<c:set value="${grid.sortBookTitle}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_cnt">Num</a>
+				         	<br/><br/>
+				         	<c:set value="${grid.sortBookCount}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_libAthr">Author</a>
+				         	<br/><br/>
+				         	<c:set value="${grid.sortBookAthrName}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>				         
+				         	<a href="sort.htm?sort=bk_creatUsrId">User entered</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookCreateUser}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th >
+				         	<a href="sort.htm?sort=bk_creatDt">Date entred</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookCreateDate}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>				         
+				         	<a href="sort.htm?sort=bk_updtUsrId">User updated</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookUpdateUser}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_updtDt">Date updated</a>
+				         	<br/>
+				         	<c:set value="${grid.sortBookUpdateDate}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>
+				         	<a href="sort.htm?sort=bk_img">Image</a>
+				         	<br/><br/>
+				         	<c:set value="${grid.sortBookImage}" var="sortImg" scope="request"/>
+				         	<c:import url="/WEB-INF/jsp/sortImages.jsp"/> 
+				         </th>
+				         <th>Update</th>
+				         <th>Delete</th>
+				    </tr>
+				</thead>				
+				<c:forEach var="book" items="${bookList}">
+				        <tr>
+				          <td>${book.titl}</td>
+				          <td>${book.cnt}</td>				          
+				          <td>${book.libAthrName}</td>
+				          <td>${book.creatUsr}</td>	
+				          <td>${book.creatDt}</td>
+				          <td>${book.updtUsr}</td>	
+				          <td>${book.updtDt}</td>
+				          <td>
+				          	<c:choose>
+				          		<c:when test="${empty book.img}">
+				          		<img src="img/cross.JPG"/>
+				          		</c:when>
+				          		<c:otherwise>
+				          		<img src="img/tick.JPG"/>
+				          		</c:otherwise>
+				          	</c:choose>
+				          </td>
+				          <td>
+						    <form method="post" action="singleBookPage.htm?isNew=false">
+							<input type="hidden" name="bkId" value="${book.bkId}"/>							  
+							<button type="submit">Update</button>
+							</form> 
+						  </td>
+						  <td>
+						    <form method="post" id="deleteBook" action="deleteBook.htm">
+							<input type="hidden" name="bkId" value="${book.bkId}"/>							  
+							<button name="delete${book.bkId}" type="submit">Delete</button>
+							</form> 
+						  </td>
+				        </tr>				        
+				</c:forEach>		
+				<thead>		
+					<tr>
+						<th>
+							<form action="searchBook.htm?retPage=bookManagment" method="post">																 
+							<input style="width: 100px" type="text" name="bkTitl">
+							</form>
+						</th>
+						<th>
+							<form action="searchCnt.htm?retPage=bookManagment" method="post">
+							<input style="width: 30px" type="text" name="bkCnt">
+							</form>
+						</th>
+						<th>
+							<form action="searchAuthorBook.htm?retPage=bookManagment" method="post">
+							<input style="width: 100px" type="text" name="athrNm">
+							</form>
+						</th>						
+					</tr>		
+				</thead>		
+				</table>						
+				
+				<c:import url="/WEB-INF/jsp/pager.jsp"></c:import>		
+				
+				<p>
+				<a href="singleBookPage.htm?isNew=true"><img src="<c:url value="/img/plus.gif"/>"></a>
+				</p>
+				</c:if>												
+				
+				<div id="dialog-message" title="Delete book">
+					<p align="center" id="err">${deleteBookErr}</p>	
+				</div>						
+				
+				<div id="dialog-confirm" title="Delete book ?" style="display: none;"> 
+					<p>
+						<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+						Book will be permanently deleted and cannot be recovered. Are you sure?
+					</p>
+				</div>
+
+</body>
+</html>

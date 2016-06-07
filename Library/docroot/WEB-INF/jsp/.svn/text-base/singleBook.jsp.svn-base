@@ -1,0 +1,98 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+    
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Book create/update page</title>
+<script type="text/javascript" src="<c:url value="/js/jquery-1.4.4.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/js/dateFormat.js"/>"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("select[name=libAthrName]").val("${snglBk.libAthrName}");
+	var dat = $("#date").val();
+	dat = $.format.date(dat, "yyyy-MM-dd");
+	$("#date").val(dat);
+});
+</script>
+</head>
+<body>
+
+<c:if test="${!isNew}">	
+<h1 align="center">Book update</h1>
+</c:if>
+<c:if test="${isNew}">	
+<h1 align="center">Book create</h1>
+</c:if>
+
+<form  method="post" action="singleBook.htm">
+
+	<table>
+		<tr>
+			<td>Book title: </td>
+			<td><input type="text" maxlength="20" name="titl" value="${snglBk.titl}"/></td>
+		</tr>
+		<tr>
+			<td>Author: </td>
+			<td>
+			<select name="libAthrName">
+			    <c:forEach items="${athrList}" var="athr">
+			        <option value="${athr.athrNm}">${athr.athrNm}</option>
+			    </c:forEach>
+			</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Remaining: </td>
+			<td><input type="text" maxlength="3" name="cnt" value="${snglBk.cnt}"/></td>
+		</tr>
+	</table>
+		
+	<c:if test="${!isNew}">	
+		<input type="hidden" name="bkId" value="${snglBk.bkId}"/>	
+		<input type="hidden" id="date" name="creatDtString" value="${snglBk.creatDt}"/>
+		<input type="hidden" name="creatUsrId" value="${snglBk.creatUsrId}"/>
+	</c:if>		
+	<input type="hidden" name="updtUsrId" value="${usr.id}"/>
+	<input type="hidden" name="isNew" value="${isNew}" />
+	
+	<c:if test="${!isNew}">	
+	<p align="center"><button type="submit">Update</button></p>
+	</c:if>
+	<c:if test="${isNew}">	
+	<p align="center"><button type="submit">Create</button></p>
+	</c:if>
+	
+	<input type="hidden" name="img" value="${snglBk.img}" /> 
+
+</form>
+	
+	<p align="center"><a href="bookManagmentPage.htm">Back</a></p>
+	
+	<c:if test="${not empty singleBookErr}">
+		<p class="error" align="center">${singleBookErr}</p>	
+	</c:if>
+	<c:if test="${not empty uploadInfo}">
+		<p class="error" align="center">${uploadInfo}</p>	
+	</c:if>
+	
+<form action="uploadFile.htm" method="post" enctype="multipart/form-data">
+	<input maxlength="40" name="file" type="file"> 
+	<input type="hidden" name="bkId" value="${snglBk.bkId}"/>
+	<button type="submit">Upload</button>	
+</form>
+
+	<c:choose>
+		<c:when test="${empty snglBk.img}">
+			<p align="center">No image to display</p>			
+		</c:when>
+		<c:otherwise>
+			<img src="${snglBk.img}" width="300" height="200"></img>
+		</c:otherwise>
+	</c:choose>
+
+
+</body>
+</html>

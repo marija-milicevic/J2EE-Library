@@ -1,0 +1,332 @@
+package com.vicert.library.service.impl;
+
+
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.LibUsr;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.RentModel;
+import com.vicert.library.model.SearchRegRepositoryModel;
+import com.vicert.library.model.UserModel;
+import com.vicert.library.repository.UserRepositoryApi;
+import com.vicert.library.service.UserServiceApi;
+
+@Transactional
+@TransactionConfiguration(transactionManager="transactionManager")
+public class UserServiceImpl implements UserServiceApi {
+	
+	private UserRepositoryApi userRepositoryApi;	
+	
+	public List<LibUsr> getUsersbyRoleName(String roleName){
+		return userRepositoryApi.getUsersByRoleName(roleName);
+	}
+	
+	@Override
+	public List<LibUsr> getUsersByUsername(String username){
+		return userRepositoryApi.getUsersByUsername(username);
+	}
+	
+	@Override
+	public List<LibUsr> getUsersByStatus(int status) {
+		return userRepositoryApi.getUsersByStatus(status);
+	}
+	
+	public List<LibUsr> getInactiveUsersByGrid(GridModel grid){
+		return userRepositoryApi.getInactiveUsersByGrid(grid);
+	}
+	
+	public int getNumberOfInactiveUsers(){
+		return userRepositoryApi.getNumberOfInactiveUsers();
+	}
+	
+	@Override
+	public UserModel getUserModelByUsernameAndPassword(String username, String password) {
+		LibUsr libUsr = userRepositoryApi.getUserByUsrnmPswd(username, password);
+		if(libUsr==null){
+			return null;
+		}
+		return createUserModel(libUsr);
+	}
+	
+	@Override
+	public UserModel getUserModelByUsernameAndMD5Password(String username, String MD5password) {
+		LibUsr libUsr = userRepositoryApi.getUserByUsrnmMD5Pswd(username, MD5password);
+		if(libUsr==null){
+			return null;
+		}
+		return createUserModel(libUsr);
+	}
+	
+
+	@Override
+	public UserModel getUserModelByUserId(int id) {
+		LibUsr libUsr = userRepositoryApi.getUserById(id);
+		if(libUsr==null){
+			return null;
+		}
+		return createUserModel(libUsr);
+	}
+	
+	public List<RentModel> getRentsbyUser(int usrId){
+		List<RentModel> retList = new ArrayList<RentModel>();
+		List<LibRnt> list = userRepositoryApi.getRentsByUserId(usrId);
+		for(LibRnt libRnt:list){
+			RentModel rentModel = new RentModel();
+			rentModel.setTitl(libRnt.getLibBk().getTitl());
+			rentModel.setAuthor(libRnt.getLibBk().getLibAthr().getAthrNm());
+			rentModel.setDateOfRent(libRnt.getDtOfRnt());
+			retList.add(rentModel);
+		}
+		return retList;
+	}
+	
+	@Override
+	public void inseretUser(UserModel userModel) {
+		LibUsr libUsr = new LibUsr();
+		libUsr.setFrstNm(userModel.getFirstName());
+		libUsr.setLstNm(userModel.getLastName());
+		libUsr.setUsrnm(userModel.getUsername());
+		libUsr.setPswd(userModel.getPassword());	
+		libUsr.setMd5Pswd(MD5(userModel.getPassword()));
+		libUsr.setEmail(userModel.getEmail());
+		if(userModel.isAdmin()){
+			libUsr.setLibRole(userRepositoryApi.getRoleByName("administrator"));
+		}
+		else{
+			libUsr.setLibRole(userRepositoryApi.getRoleByName("client"));
+		}
+		libUsr.setSts(0);
+		userRepositoryApi.save(libUsr);
+	}
+	
+	@Override
+	public void updateUser(UserModel userModel) {
+		LibUsr libUsr = new LibUsr();
+		libUsr.setUsrId(userModel.getId());
+		libUsr.setFrstNm(userModel.getFirstName());
+		libUsr.setLstNm(userModel.getLastName());
+		libUsr.setUsrnm(userModel.getUsername());
+		libUsr.setPswd(userModel.getPassword());
+		libUsr.setMd5Pswd(MD5(userModel.getPassword()));
+		libUsr.setEmail(userModel.getEmail());		
+		libUsr.setNbrOfAllowBk(userModel.getAllowedBooks());
+		if(userModel.isAdmin()){
+			libUsr.setLibRole(userRepositoryApi.getRoleByName("administrator"));
+		}
+		else{
+			libUsr.setLibRole(userRepositoryApi.getRoleByName("client"));
+		}
+		String message="Welcome to the Library\n\n";
+		if(userModel.getStatus().equals("yes")){
+			libUsr.setSts(1);
+			userRepositoryApi.saveOrUpdate(libUsr);	
+			message+="You have successfully been registered\n\n";
+			
+			message+="***" + userModel.getFirstName() + " " +userModel.getLastName() + "***\n";
+			message+="Username :" + userModel.getUsername() + "\n";
+			message+="Password :" + userModel.getPassword() + "\n";
+			message+="Allowed Books :" + userModel.getAllowedBooks() + "\n";
+			
+			message+="\nGo to Library page :\n";
+			message+="http://localhost:8181/Library/";
+		}
+		else if(userModel.getStatus().equals("no")){
+			libUsr.setSts(0);
+			userRepositoryApi.delete(libUsr);
+			message+="Your registration has been denied\n";
+		}			
+		//Send mail using javax.mail package
+		/*try{
+			postMail(new String[]{userModel.getEmail()}, "Library Account Conformation", message, "sinisa.djerasevic@vicert.com");
+		}catch (MessagingException e) {
+			System.out.println("**********************************************************");
+			e.printStackTrace();
+			System.out.println("**********************************************************");
+		}*/
+		sendSpringMail(userModel.getEmail(), "Library Account Conformation", message, "ckembet@gmail.com");
+	}
+	
+
+	@Override
+	public boolean isUsernameActive(String username, int usrId) {
+		List<LibUsr> list = userRepositoryApi.getUserByUsersnameExceptId(username, usrId);
+		for(LibUsr libUsr:list){
+			if(libUsr.getSts()==1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public SearchRegRepositoryModel searchRegByFirstName(String frstNm,int res){
+		return userRepositoryApi.searchRegByFirstName(frstNm,res);
+	}
+	
+	public SearchRegRepositoryModel searchRegByLastName(String lstNm,int res){
+		return userRepositoryApi.searchRegByLastName(lstNm,res);
+	}
+	
+	public SearchRegRepositoryModel searchRegByLastUsername(String usrnm,int res){
+		return userRepositoryApi.searchRegByLastUsername(usrnm,res);
+	}
+	
+	//GETTERS AND SETTERS
+
+	public void setUserRepositoryApi(UserRepositoryApi userRepositoryApi) {
+		this.userRepositoryApi = userRepositoryApi;
+	}
+
+	public UserRepositoryApi getUserRepositoryApi() {
+		return userRepositoryApi;
+	}
+	
+	//UTILITES METHODS
+	
+	private String convertToHex(byte[] data) { 
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < data.length; i++) { 
+            int halfbyte = (data[i] >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do { 
+                if ((0 <= halfbyte) && (halfbyte <= 9)) 
+                    buf.append((char) ('0' + halfbyte));
+                else 
+                    buf.append((char) ('a' + (halfbyte - 10)));
+                halfbyte = data[i] & 0x0F;
+            } while(two_halfs++ < 1);
+        } 
+        return buf.toString();
+    } 
+
+	
+	public String MD5(String text) {
+		try{
+        MessageDigest md;
+        md = MessageDigest.getInstance("MD5");
+        byte[] md5hash = new byte[32];
+        md.update(text.getBytes("iso-8859-1"), 0, text.length());
+        md5hash = md.digest();		
+        return convertToHex(md5hash);
+		}catch (Exception e) {
+			System.out.println(e.getStackTrace());
+		}
+		return null;
+    } 
+	
+	private UserModel createUserModel(LibUsr libUsr){
+		UserModel userModel = new UserModel();
+		userModel.setId(libUsr.getUsrId());
+		userModel.setFirstName(libUsr.getFrstNm());
+		userModel.setLastName(libUsr.getLstNm());
+		userModel.setPassword(libUsr.getPswd());
+		userModel.setEmail(libUsr.getEmail());
+		if(libUsr.getNbrOfAllowBk()!=null){
+			userModel.setAllowedBooks(libUsr.getNbrOfAllowBk());
+		}
+		else{
+			userModel.setAllowedBooks(0);
+		}
+		userModel.setUsername(libUsr.getUsrnm());
+		userModel.setAdmin(libUsr.getLibRole().getRoleNm().equals("administrator")? true : false);
+		return userModel;
+	}
+	
+	//UTILITES METHODS
+	
+	public void sendSpringMail(String to, String subject, String message, String from){
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		
+		Properties mailProps = new Properties();
+		mailProps.put("mail.smtp.auth", "true");
+		mailProps.put("mail.smtp.starttls.enable", "true");
+		//See debug in console
+		//mailProps.put("mail.debug", "true");
+		mailSender.setJavaMailProperties(mailProps);
+		
+		mailSender.setProtocol("smtp");	
+		mailSender.setPort(587);
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setUsername("ckembet@gmail.com");
+		mailSender.setPassword("ckembet123");
+
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setTo(to);
+		mailMessage.setSubject(subject);
+		mailMessage.setText(message);
+		mailMessage.setFrom(from);
+		
+		try{
+		mailSender.send(mailMessage);
+		}catch (Exception e) {
+			System.out.println("**********************************************************");
+			e.printStackTrace();
+			System.out.println("**********************************************************");
+		}
+		
+	}
+	
+	public void postMail( String recipients[ ], String subject, String message , String from) throws MessagingException
+	{
+	    boolean debug = false;
+
+	     //Set the host smtp address
+	     Properties props = new Properties();
+	     props.put("mail.smtp.host","smtp.gmail.com");	        
+	     props.put("mail.smtp.starttls.enable","true");
+	     props.put("mail.smtp.auth","true");
+	     props.put("mail.smtp.port","587");	
+	     //See debug in console
+	     //props.put("mail.debug", "true");
+
+	    // create some properties and get the default Session
+	    Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() 
+		{
+			protected PasswordAuthentication getPasswordAuthentication()
+			{ return new PasswordAuthentication("ckembet@gmail.com","ckembet123");	}
+		});
+	    session.setDebug(debug);
+
+	    // create a message
+	    Message msg = new MimeMessage(session);
+
+	    // set the from and to address
+	    InternetAddress addressFrom = new InternetAddress(from);
+	    msg.setFrom(addressFrom);
+
+	    InternetAddress[] addressTo = new InternetAddress[recipients.length]; 
+	    for (int i = 0; i < recipients.length; i++)
+	    {
+	        addressTo[i] = new InternetAddress(recipients[i]);
+	    }
+	    msg.setRecipients(Message.RecipientType.TO, addressTo);
+	   
+
+	    // Optional : You can also set your custom headers in the Email if you Want
+	    // msg.addHeader("MyHeaderName", "myHeaderValue");
+
+	    // Setting the Subject and Content Type
+	    msg.setSubject(subject);
+	    msg.setContent(message, "text/plain");
+	    Transport.send(msg);
+	}
+
+	
+}

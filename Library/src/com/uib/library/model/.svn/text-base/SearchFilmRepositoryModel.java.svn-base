@@ -1,0 +1,29 @@
+package com.vicert.library.model;
+
+import java.util.List;
+
+import com.vicert.library.domain.LibBk;
+
+public class SearchBookRepositoryModel {
+	
+	private List<LibBk> list;
+	private int results;
+	
+	//GETTERS AND SETTERS
+	
+	public void setResults(int results) {
+		this.results = results;
+	}
+	public int getResults() {
+		return results;
+	}
+	public void setList(List<LibBk> list) {
+		this.list = list;
+	}
+	public List<LibBk> getList() {
+		return list;
+	}
+	
+	
+
+}

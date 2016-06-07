@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.uib.library.domain.Rent" table="rent">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.RentBase</meta>
+        <composite-id name="id" class="com.uib.library.domain.base.RentId">
+            <key-property name="filmId" type="integer">
+                <column name="film_id" precision="22" scale="0" />
+            </key-property>
+            <key-property name="usrId" type="integer">
+                <column name="user_id" precision="22" scale="0" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="libUsr" class="com.uib.library.domain.User" update="false" insert="false" fetch="select">
+            <column name="user_id" precision="22" scale="0" not-null="true" />
+        </many-to-one>
+        <many-to-one name="film" class="com.uib.library.domain.Film" update="false" insert="false" fetch="select">
+            <column name="film_id" precision="22" scale="0" not-null="true" />
+        </many-to-one>
+        <property name="dtOfRnt" type="date">
+            <column name="dt_of_rnt" length="7" not-null="true" />
+        </property>
+        <property name="dtOfRet" type="date">
+            <column name="dt_of_ret" length="7" />
+        </property>
+    </class>
+</hibernate-mapping>

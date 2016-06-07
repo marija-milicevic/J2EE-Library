@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package com.vicert.library.domain;
+
+import com.vicert.library.domain.base.LibBkBase;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class LibBk extends LibBkBase {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3083492151545043358L;
+
+}

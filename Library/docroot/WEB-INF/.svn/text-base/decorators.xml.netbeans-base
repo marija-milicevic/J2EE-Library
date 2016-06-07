@@ -1,0 +1,46 @@
+<decorators defaultdir="/WEB-INF/decorators">
+	
+	<!--<excludes>
+		<pattern>/loginPage.htm</pattern>
+		<pattern>/loginPage.htm**</pattern>	
+		<pattern>/registrationPage.htm</pattern>
+		<pattern>/register.htm</pattern>	
+    </excludes>-->
+	
+	<decorator name="login" page="login.jsp">
+		<pattern>/loginPage.htm</pattern>
+		<pattern>/loginPage.htm**</pattern>	
+		<pattern>/registrationPage.htm</pattern>
+		<pattern>/register.htm</pattern>
+	</decorator>
+	
+	<decorator name="mangment" page="managment.jsp">	
+		<pattern>/**</pattern>
+		<!--<pattern>/singleRegistrationPage.htm</pattern>
+		<pattern>/singleAuthorPage.htm</pattern>
+		<pattern>/singleBookPage.htm</pattern>	
+		
+		<pattern>/login.htm</pattern>		
+		
+		<pattern>/homePage.htm</pattern>
+		<pattern>/bookReturn.htm</pattern>
+		
+		<pattern>/regManagment.htm</pattern>
+		<pattern>/regManagmentPage.htm</pattern>
+		<pattern>/singleRegistration.htm</pattern>
+			
+		<pattern>/authorManagment.htm</pattern>
+		<pattern>/authorManagmentPage.htm</pattern>
+		<pattern>/singleAuthor.htm</pattern>		
+		<pattern>/deleteAuthor.htm</pattern>
+		
+		<pattern>/bookManagment.htm</pattern>
+		<pattern>/bookManagmentPage.htm</pattern>
+		<pattern>/singleBook.htm</pattern>
+		<pattern>/deleteBook.htm</pattern>
+		
+		<pattern>/bookRent.htm</pattern>
+		<pattern>/bookRentPage.htm</pattern>-->				
+	</decorator>
+
+</decorators>

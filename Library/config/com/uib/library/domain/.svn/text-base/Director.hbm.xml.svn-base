@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Nov 11, 2010 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.vicert.library.domain.LibAthr" table="LIB_ATHR">
+    <meta attribute="generated-class" inherit="false">com.vicert.library.domain.base.LibAthrBase</meta>
+        <id name="athrId" type="integer">
+			<column name="ATHR_ID" precision="22" scale="0" />
+			<generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+			<param name="sequence_name">IDAUTHAUTOINC</param>
+			<param name="increment_size">0</param>
+			<param name="optimizer">pooled</param>
+			</generator>
+		</id>
+        <property name="athrNm" type="string">
+            <column name="ATHR_NM" length="20" not-null="true" />
+        </property>
+        <property name="dtOfBth" type="date">
+            <column name="DT_OF_BTH" length="7" />
+        </property>
+        <property name="creatDt" type="date">
+            <column name="CREAT_DT" length="7" not-null="true" />
+        </property>
+        <property name="creatUsrId" type="integer">
+            <column name="CREAT_USR_ID" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="updtUsrId" type="integer">
+            <column name="UPDT_USR_ID" precision="22" scale="0" />
+        </property>
+        <property name="updtDt" type="date">
+            <column name="UPDT_DT" length="7" />
+        </property>
+        <set name="libBks" table="LIB_BK" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ATHR_ID" precision="22" scale="0" />
+            </key>
+            <one-to-many class="com.vicert.library.domain.LibBk" />
+        </set>
+    </class>
+</hibernate-mapping>

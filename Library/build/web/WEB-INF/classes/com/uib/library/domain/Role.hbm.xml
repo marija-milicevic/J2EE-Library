@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.uib.library.domain.Role" table="role">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.RoleBase</meta>
+		<id name="roleId" type="integer">
+			<column name="role_id" precision="22" scale="0" />
+			<!--<generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+			<param name="sequence_name">LIB_ROLE_SEQ</param>
+			<param name="increment_size">0</param>
+			<param name="optimizer">pooled</param>
+			</generator>-->
+		</id>
+        <property name="roleNm" type="string">
+            <column name="role_nm" length="20" not-null="true" />
+        </property>
+        <set name="users" table="user" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="role_id" precision="22" scale="0" />
+            </key>
+            <one-to-many class="com.uib.library.domain.User" />
+        </set>
+    </class>
+</hibernate-mapping>

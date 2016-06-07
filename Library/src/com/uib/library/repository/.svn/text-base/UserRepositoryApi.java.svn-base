@@ -1,0 +1,44 @@
+/**
+ * 
+ */
+package com.vicert.library.repository;
+
+import java.util.List;
+
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.LibRole;
+import com.vicert.library.domain.LibUsr;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchRegRepositoryModel;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public interface UserRepositoryApi extends BaseRepositoryApi {
+	
+	public List<LibUsr> getUsersByRoleName(String roleName);
+	public List<LibUsr> getUsersByUsername(String username);
+	public List<LibUsr> getUsersByStatus(int status);
+	public List<LibUsr> getInactiveUsersByGrid(GridModel grid);
+	public int getNumberOfInactiveUsers();
+	public List<LibUsr> getUserByUsersnameExceptId(String username,int usrId);
+	
+	public LibUsr getUserByUsrnmPswd(String username,String password);
+	public LibUsr getUserByUsrnmMD5Pswd(String username,String MD5Password);
+	public LibUsr getUserById(int id);	
+	
+	public List<LibRnt> getRentsByUserId(int usrId);
+	
+	public LibRole getRoleByName(String roleName);
+	
+	public void deleteAllUsers();
+	public void deleteAllRoles();
+	public void deleteAllRents();
+	public List<LibRnt> deleteRentsbyUsrId(int usrId);
+	
+	public SearchRegRepositoryModel searchRegByFirstName(String frstNm,int res);
+	public SearchRegRepositoryModel searchRegByLastName(String lstNm,int res);
+	public SearchRegRepositoryModel searchRegByLastUsername(String usrnm,int res);
+		
+}

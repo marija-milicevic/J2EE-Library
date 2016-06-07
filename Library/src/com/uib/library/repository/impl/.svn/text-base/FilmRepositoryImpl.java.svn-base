@@ -1,0 +1,362 @@
+/**
+ * 
+ */
+package com.vicert.library.repository.impl;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import com.vicert.library.domain.LibAthr;
+import com.vicert.library.domain.LibBk;
+import com.vicert.library.domain.LibRnt;
+import com.vicert.library.domain.base.LibRntId;
+import com.vicert.library.model.GridModel;
+import com.vicert.library.model.SearchAuthorRepositoryModel;
+import com.vicert.library.model.SearchBookRepositoryModel;
+import com.vicert.library.repository.BookRepositoryApi;
+
+/**
+ * @author sinisa.djerasevic
+ *
+ */
+public class BookRepositoryImpl extends BaseRepositoryImpl implements BookRepositoryApi {
+		
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibBk> getAvailableBooks() {
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");		
+		crit.add(Restrictions.gt("cnt", new Integer(0)));		
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LibBk> getBooksByGrid(GridModel grid){
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");	
+		if(!grid.isSortDesc()){
+			crit.addOrder(Order.asc(grid.getCmpString()));
+		}
+		else{
+			crit.addOrder(Order.desc(grid.getCmpString()));
+		}
+		String search=grid.getSearchString();
+		if(!search.equals("")){
+			if(search.contains("Rnt")){
+				search=search.substring(3);
+			}
+			if(search.contains("libAthr")){
+				crit.createAlias("book.libAthr","libAthr");				
+				crit.add(Restrictions.like("libAthr.athrNm", search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));
+			}			
+			else if(search.substring(0, search.lastIndexOf('_')).equals("cnt") ){
+				crit.add(Restrictions.eq(search.substring(0, search.lastIndexOf('_')),Integer.parseInt(search.substring(search.lastIndexOf('_')+1))));	
+			}
+			else{
+				crit.add(Restrictions.like(search.substring(0, search.lastIndexOf('_')),search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));					
+			}
+		}
+		crit.setFirstResult(grid.getItemsPerPage()*grid.getPageNumber());	
+		crit.setMaxResults(grid.getItemsPerPage());		
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LibBk> getAvailableBooksBooksByGrid(GridModel grid){
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");	
+		crit.add(Restrictions.gt("cnt", new Integer(0)));
+		if(!grid.isSortDesc()){
+			crit.addOrder(Order.asc(grid.getCmpString()));
+		}
+		else{
+			crit.addOrder(Order.desc(grid.getCmpString()));
+		}
+		String search=grid.getSearchString();
+		if(!search.equals("")){
+			if(search.contains("libAthr")){
+				crit.createAlias("book.libAthr","libAthr");				
+				crit.add(Restrictions.like("libAthr.athrNm", search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));
+			}			
+			else if(search.substring(0, search.lastIndexOf('_')).equals("cnt") ){
+				crit.add(Restrictions.eq(search.substring(0, search.lastIndexOf('_')),Integer.parseInt(search.substring(search.lastIndexOf('_')+1))));	
+			}
+			else{
+				crit.add(Restrictions.like(search.substring(0, search.lastIndexOf('_')),search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));					
+			}
+		}
+		crit.setFirstResult(grid.getItemsPerPage()*grid.getPageNumber());	
+		crit.setMaxResults(grid.getItemsPerPage());		
+		return crit.list();
+	}
+	
+	// Get all books by tiltle (exclude book with bkId) if the book is
+	// new then it adds it too (create book) hence if the book is updated
+	// (update book) id doesn't add it to list - method for checking if book 
+	//	with given title already exists
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibBk> getBooksByTitleExceptId(String titl, int bkId, boolean isNew) {
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+
+		if (!isNew) {
+			if (titl != null) {
+				if (bkId != 0 && titl != "") {
+					crit.add(Restrictions.eq("titl", titl));
+					crit.add(Restrictions.ne("bkId", bkId));
+				} else
+					return null;
+			}
+		} else {
+			if (titl != null) {
+				if (titl != "") {
+					crit.add(Restrictions.eq("titl", titl));
+				} else
+					return null;
+			}
+		}
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibBk> getBooksByImgExceptId(String img, int bkId, boolean isNew) {
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+
+		if (!isNew) {
+			if (img != null) {
+				if (bkId != 0 && img != "") {
+					crit.add(Restrictions.eq("img", img));
+					crit.add(Restrictions.ne("bkId", bkId));
+				} else
+					return null;
+			}
+		} else {
+			if (img != null) {
+				if (img != "") {
+					crit.add(Restrictions.eq("img", img));
+				} else
+					return null;
+			}
+		}
+		return crit.list();
+	}
+	
+	@Override
+	public LibBk getBookById(int bkId) {
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");		
+		if(bkId!=0){
+			crit.add(Restrictions.eq("bkId", bkId));
+			return (LibBk)crit.uniqueResult();			
+		}
+		return null;
+	}
+	
+	public int getNumOfBooks(){
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+		return crit.list().size();
+	}
+	
+	public int getNumOfAvailableBooks(){
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+		crit.add(Restrictions.gt("cnt", new Integer(0)));
+		return crit.list().size();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibAthr> getAuthorsByNameExceptId(String athrName, int athrId, boolean isNew) {
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");		
+		
+		if(!isNew){
+			if(athrName!=null){
+				if(athrId!=0 && athrName!=""){
+					crit.add(Restrictions.eq("athrNm", athrName));
+					crit.add(Restrictions.ne("athrId", athrId));			
+				}
+				else return null;
+			}
+		}
+		else{
+			if(athrName!=null){
+				if(athrName!=""){
+					crit.add(Restrictions.eq("athrNm", athrName));		
+				}
+				else return null;
+			}
+		}
+		
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LibAthr> getAuthorsByGrid(GridModel grid){
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");	
+		if(!grid.isSortDesc()){
+			crit.addOrder(Order.asc(grid.getCmpString()));
+		}
+		else{
+			crit.addOrder(Order.desc(grid.getCmpString()));
+		}
+		String search=grid.getSearchString();
+		if(!search.equals("")){
+				crit.add(Restrictions.like(search.substring(0, search.lastIndexOf('_')),search.substring(search.lastIndexOf('_')+1) , MatchMode.ANYWHERE));					
+		}
+		crit.setFirstResult(grid.getItemsPerPage()*grid.getPageNumber());	
+		crit.setMaxResults(grid.getItemsPerPage());		
+		return crit.list();
+	}
+	
+	public int getNumOfAuthors(){
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");
+		return crit.list().size();
+	}
+
+	@Override
+	public LibAthr getAuthorByName(String authorName) {
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");
+		
+		if(authorName!=null){
+			if(!authorName.equals("")){
+				crit.add(Restrictions.eq("athrNm", authorName));
+			}		
+			else return null;
+		}
+		
+		return (LibAthr)crit.uniqueResult();
+		
+	}
+	
+	@Override
+	public LibAthr getAuthorById(int athrId) {
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");		
+		if(athrId!=0){
+			crit.add(Restrictions.eq("athrId", athrId));
+			return (LibAthr)crit.uniqueResult();			
+		}
+		return null;
+	}
+
+	@Override
+	public void deleteAllAuthors() {
+		deleteAll("LibAthr");
+	}
+
+	@Override
+	public void deleteAllBooks() {
+		deleteAll("LibBk");
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibRnt> getRentByRntId(LibRntId rntId) {
+		Criteria crit = getSession().createCriteria(LibRnt.class, "rnt");
+		crit.add(Restrictions.eq("id", rntId));
+		return crit.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibAthr> getSortedAuthors(String sort) {
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");
+		crit.addOrder(Order.asc(sort));	
+		return crit.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LibBk> getSortedBooks(String sort) {
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");		
+		if(sort.equals("libAthr")){
+			crit.createAlias("book.libAthr","libAthr");			
+			crit.addOrder(Order.asc("libAthr.athrNm"));
+		}
+		else if(sort.substring(0, 3).equals("Rnt")){
+			if(sort.equals("libAthr")){
+				crit.createAlias("book.libAthr","libAthr");			
+				crit.addOrder(Order.asc("libAthr.athrNm"));
+			}
+			crit.add(Restrictions.gt("cnt", new Integer(0)));
+			crit.addOrder(Order.asc(sort.substring(3)));			
+		}
+		else {
+			crit.addOrder(Order.asc(sort));
+		}
+		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public SearchAuthorRepositoryModel searchAuthorByName(String athrNm,int res) {
+		SearchAuthorRepositoryModel ret = new SearchAuthorRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibAthr.class, "author");
+		crit.add(Restrictions.like("athrNm", athrNm , MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SearchBookRepositoryModel searchBookByTitle(String bkTitl,boolean rent,int res) {
+		SearchBookRepositoryModel ret = new SearchBookRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+		crit.addOrder(Order.asc("titl"));
+		if(rent){
+			crit.add(Restrictions.gt("cnt", new Integer(0)));
+		}		
+		crit.add(Restrictions.like("titl", bkTitl , MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SearchBookRepositoryModel searchBookCnt(String cnt,boolean rent,int res) {
+		SearchBookRepositoryModel ret = new SearchBookRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");
+		crit.addOrder(Order.asc("titl"));
+		if(rent){
+			crit.add(Restrictions.gt("cnt", new Integer(0)));
+		}
+		int iCnt=0;		
+		if(!cnt.equals("")){
+			iCnt = Integer.parseInt(cnt);			
+			crit.add(Restrictions.eq("cnt", iCnt));
+		}
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SearchBookRepositoryModel searchBookByAuthor(String athrNm,boolean rent,int res) {
+		SearchBookRepositoryModel ret = new SearchBookRepositoryModel();
+		Criteria crit = getSession().createCriteria(LibBk.class, "book");	
+		crit.addOrder(Order.asc("titl"));
+		if(rent){
+			crit.add(Restrictions.gt("cnt", new Integer(0)));
+		}
+		crit.createAlias("book.libAthr","libAthr");
+		crit.add(Restrictions.like("libAthr.athrNm", athrNm , MatchMode.ANYWHERE));
+		ret.setResults(crit.list().size());
+		crit.setMaxResults(res);
+		ret.setList(crit.list());
+		return ret;
+	}
+
+	@Override
+	public void insertImgToBook(String img, int bkId) {
+		LibBk libBk = getBookById(bkId);
+		libBk.setImg(img);
+		update(libBk);		
+	}
+
+}

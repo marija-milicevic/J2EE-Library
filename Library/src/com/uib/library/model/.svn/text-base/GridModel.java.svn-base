@@ -1,0 +1,204 @@
+package com.vicert.library.model;
+
+public class GridModel {		
+		
+	private int pageNumber=0;	
+	private int itemsPerPage=5;
+	private int pages;
+	private int items;
+	private String retPage;
+	private String cmpString;
+	private String searchString="";
+	
+	private boolean sortDesc;
+	
+	private int sortRegFirstName=2;
+	private int sortRegLastName=2;
+	private int sortRegUsername=2;
+	
+	private int sortAthrName=2;
+	private int sortAthrDateOfBirth=2;
+	private int sortAthrCreateDate=2;
+	private int sortAthrUpdateDate=2;
+	private int sortAthrCreateUser=2;
+	private int sortAthrUpdateUser=2;
+	
+	private int sortBookTitle=2;
+	private int sortBookCount=2;
+	private int sortBookAthrName=2;
+	private int sortBookCreateDate=2;
+	private int sortBookUpdateDate=2;
+	private int sortBookCreateUser=2;
+	private int sortBookUpdateUser=2;
+	private int sortBookImage=2;
+	
+	//GETTERS AND SETTERS
+	
+	public int getPageNumber() {
+		return pageNumber;
+	}
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+	public void setPages(int pages) {
+		this.pages = pages;
+	}
+	public int getPages() {
+		return pages;
+	}
+	public void setItemsPerPage(int itemsPerPage) {
+		this.itemsPerPage = itemsPerPage;
+	}
+	public int getItemsPerPage() {
+		return itemsPerPage;
+	}
+	public void setItems(int items) {
+		this.items = items;
+	}
+	public int getItems() {
+		return items;
+	}
+	public void setRetPage(String retPage) {
+		this.retPage = retPage;
+	}
+	public String getRetPage() {
+		return retPage;
+	}	
+	
+	public void setCmpString(String cmpString) {
+		this.cmpString = cmpString;
+	}
+	public String getCmpString() {
+		return cmpString;
+	}
+	
+	public void setSearchString(String searchString) {
+		this.searchString = searchString;
+	}
+	public String getSearchString() {
+		return searchString;
+	}
+	
+	public boolean isSortDesc() {
+		return sortDesc;
+	}
+	public void setSortDesc(boolean sortDesc) {
+		this.sortDesc = sortDesc;
+	}
+	public int getSortRegFirstName() {
+		return sortRegFirstName;
+	}
+	public void setSortRegLastName(int sortRegLastName) {
+		this.sortRegLastName = sortRegLastName;
+	}
+	public int getSortRegLastName() {
+		return sortRegLastName;
+	}
+	public void setSortRegUsername(int sortRegUsername) {
+		this.sortRegUsername = sortRegUsername;
+	}
+	public int getSortRegUsername() {
+		return sortRegUsername;
+	}
+	public int getSortAthrName() {
+		return sortAthrName;
+	}
+	public void setSortAthrName(int sortAthrName) {
+		this.sortAthrName = sortAthrName;
+	}
+	public int getSortAthrDateOfBirth() {
+		return sortAthrDateOfBirth;
+	}
+	public void setSortAthrDateOfBirth(int sortAthrDateOfBirth) {
+		this.sortAthrDateOfBirth = sortAthrDateOfBirth;
+	}
+	public int getSortAthrCreateDate() {
+		return sortAthrCreateDate;
+	}
+	public void setSortAthrCreateDate(int sortAthrCreateDate) {
+		this.sortAthrCreateDate = sortAthrCreateDate;
+	}
+	public int getSortAthrUpdateDate() {
+		return sortAthrUpdateDate;
+	}
+	public void setSortAthrUpdateDate(int sortAthrUpdateDate) {
+		this.sortAthrUpdateDate = sortAthrUpdateDate;
+	}
+	public void setSortAthrCreateUser(int sortAthrCreateUser) {
+		this.sortAthrCreateUser = sortAthrCreateUser;
+	}
+	public int getSortAthrCreateUser() {
+		return sortAthrCreateUser;
+	}
+	public void setSortAthrUpdateUser(int sortAthrUpdateUser) {
+		this.sortAthrUpdateUser = sortAthrUpdateUser;
+	}
+	public int getSortAthrUpdateUser() {
+		return sortAthrUpdateUser;
+	}
+	public int getSortBookTitle() {
+		return sortBookTitle;
+	}
+	public void setSortBookTitle(int sortBookTitle) {
+		this.sortBookTitle = sortBookTitle;
+	}
+	public int getSortBookCount() {
+		return sortBookCount;
+	}
+	public void setSortBookCount(int sortBookCount) {
+		this.sortBookCount = sortBookCount;
+	}
+	public int getSortBookAthrName() {
+		return sortBookAthrName;
+	}
+	public void setSortBookAthrName(int sortBookAthrName) {
+		this.sortBookAthrName = sortBookAthrName;
+	}
+	public int getSortBookCreateDate() {
+		return sortBookCreateDate;
+	}
+	public void setSortBookCreateDate(int sortBookCreateDate) {
+		this.sortBookCreateDate = sortBookCreateDate;
+	}
+	public void setSortBookUpdateDate(int sortBookUpdateDate) {
+		this.sortBookUpdateDate = sortBookUpdateDate;
+	}
+	public int getSortBookUpdateDate() {
+		return sortBookUpdateDate;
+	}
+	public void setSortBookCreateUser(int sortBookCreateUser) {
+		this.sortBookCreateUser = sortBookCreateUser;
+	}
+	public int getSortBookCreateUser() {
+		return sortBookCreateUser;
+	}
+	public void setSortBookUpdateUser(int sortBookUpdateUser) {
+		this.sortBookUpdateUser = sortBookUpdateUser;
+	}
+	public int getSortBookUpdateUser() {
+		return sortBookUpdateUser;
+	}
+	public int getSortBookImage() {
+		return sortBookImage;
+	}
+	public void setSortBookImage(int sortBookImage) {
+		this.sortBookImage = sortBookImage;
+	}	
+	
+	// UTILITIES METHODS    
+    
+	public String toString(){       
+    	String ret="------------ Grid ------------\n";
+    	ret+=  "PgNm: " + pageNumber  +"\n";
+    	ret+=  "ItPp: " + itemsPerPage  +"\n";
+    	ret+=  "Pags: " + pages  +"\n";
+    	ret+=  "Itms: " + items  +"\n";
+    	ret+=  "rtPg: " + retPage  +"\n";
+    	ret+=	"------------------------------\n";
+    	return ret;
+    }
+	public void setSortRegFirstName(int sortRegFirstName) {
+		this.sortRegFirstName = sortRegFirstName;
+	}
+
+}

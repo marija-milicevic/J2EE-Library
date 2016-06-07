@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 11, 2013 3:30:32 PM by Hibernate Tools 3.3.0.GA -->
+<hibernate-mapping>
+    <class name="com.uib.library.domain.Director" table="director">
+    <meta attribute="generated-class" inherit="false">com.uib.library.domain.base.DirectorBase</meta>
+        <id name="directorID" column="director_id" type="integer">
+           <generator class="increment"/>
+	</id>
+        <property name="directorName" type="string">
+            <column name="name" length="50" not-null="true" />
+        </property>
+        <property name="dtOfBth" type="date">
+            <column name="dt_of_bth" length="7" />
+        </property>
+        <property name="creatDt" type="date">
+            <column name="dt_create" length="7" not-null="true" />
+        </property>
+        <property name="creatUsrId" type="integer">
+            <column name="create_usr_id" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="updtUsrId" type="integer">
+            <column name="updt_usr_id" precision="22" scale="0" />
+        </property>
+        <property name="updtDt" type="date">
+            <column name="dt_updt" length="7" />
+        </property>
+        <set name="films" table="film" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="director_id" precision="22" scale="0" />
+            </key>
+            <one-to-many class="com.uib.library.domain.Film" />
+        </set>
+    </class>
+</hibernate-mapping>
